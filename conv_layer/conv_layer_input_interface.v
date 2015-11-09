@@ -37,7 +37,7 @@ parameter	STAGE_ROW_1			=	3'd3;
 parameter	STAGE_ROW_2			=	3'd4;
 parameter	STAGE_BIAS			=	3'd5;
 parameter	STAGE_LOAD			=	3'd6;
-parameter	STAGE_STAGE_BIAS	=	3'd7;
+parameter	STAGE_IDLE			=	3'd7;
 
 
 input					clk;
@@ -108,21 +108,27 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
+always @(idle) begin
+	if(idle) begin
+		last_state	=	current_state;
+	end
+end
+
+
 always @(current_state, read_index, shift_idx, cmd) begin
-	// if (STAGE_BIAS) begin
-		// next_state	= STAGE_BIAS;
-	// end
-	// else begin
 		case (current_state)	
 			
-			INIT: begin
+			INIT: begin 
+				if ( cmd == PRELOAD )
 					next_state	=	STAGE_PRELOAD;
+				else
+					next_state	=	INIT;
 			end
 			
 			STAGE_PRELOAD: begin
-				if ( )
+				if (  )
 					next_state	=	STAGE_ROW_0;
-				else	
+				else if ( )	
 					next_state	=	STAGE_PRELOAD;
 			end
 			
@@ -138,15 +144,8 @@ always @(current_state, read_index, shift_idx, cmd) begin
 					next_state	=	STAGE_ROW_2;
 				else
 					next_state	=	STAGE_ROW_1;			
-			end
-			
-/* 			STAGE_ROW_2: begin
-				if (shift_idx	== 	2'b10)
-					next_state	=	STAGE_ROW_0;
-				else
-					next_state	=	STAGE_ROW_2;				
-			end */
-			
+			end					
+		
 			STAGE_ROW_2: begin
 				if (shift_idx	== 	2'b10)
 					next_state	=	STAGE_BIAS;
@@ -155,14 +154,28 @@ always @(current_state, read_index, shift_idx, cmd) begin
 			end
 			
 			STAGE_BIAS: begin
-//				if (!STAGE_BIAS)
-					next_state 	= 	STAGE_ROW_0;
-//				else
-//					next_state 	=	STAGE_BIAS;
+				if ( )
+					next_state 	= 	STAGE_LOAD;
+				else
+					next_state 	=	STAGE_ROW_0;
 			end
-									
+			
+			STAGE_LOAD: begin
+				if ( )
+					next_state	=	STAGE_ROW_0;
+				else
+					next_state	=	LOAD;
+			end
+			
+			STAGE_IDLE: begin
+				if ()
+					next_state	=	last_state;
+				else
+					next_state	=	STAGE_IDLE;
+			end
+			
 			default: begin
-				next_state	=	INIT;
+				next_state	=	STAGE_IDLE;
 			end
 		endcase
 //	end
@@ -181,28 +194,27 @@ always @(posedge clk, negedge rst_n) begin
 			end
 			
 			STAGE_PRELOAD: begin
-				rom_addr	=	rom_addr + 1'b1;
+				rom_addr	<=	rom_addr + 1'b1;
 			end
 			
 			STAGE_ROW_0: begin
-//				if (shift_idx == 2'b10)
-				if (shift_idx == 2'b10 || read_index == 5'b0111)
-					rom_addr	<=	rom_addr + 1'b1;
-				else
-					rom_addr	<=	rom_addr;
+				rom_addr	<=	rom_addr;
 			end
 			
 			STAGE_ROW_1: begin
-				rom_addr	<=	rom_addr + 1'b1;
+				rom_addr	<=	rom_addr;
 			end
 			
 			STAGE_ROW_2: begin
-				rom_addr	<=	rom_addr + 1'b1;
+				rom_addr	<=	rom_addr;
 			end	
 
 			STAGE_BIAS: begin
 				rom_addr	<=	rom_addr;
 			end
+			
+			STAGE_LOAD: begin
+				rom_addr	<=	rom_addr + 1'b1;
 				
 			default: begin
 				rom_addr	<=	rom_addr;
@@ -224,37 +236,33 @@ always @(posedge clk, negedge rst_n) begin
 			end
 			
 			STAGE_PRELOAD: begin
-				if (read_index == 5'd23)
+				if (read_index == 5'd7)
 					read_index	<=	5'b0;
 				else
 					read_index	<=	read_index + 1'b1;
 			end
 			
 			STAGE_ROW_0: begin
-				if (shift_idx == 2'b10)
-					read_index	<=	read_index + 1'b1;
-				else if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index;					
+				read_index	<=	read_index;					
 			end
 			
 			STAGE_ROW_1: begin
-				if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index + 1'b1;
+				read_index	<=	read_index;
 			end
 			
 			STAGE_ROW_2: begin
-				if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index + 1'b1;
+				read_index	<=	read_index;
 			end
 			
 			STAGE_BIAS: begin
 				read_index	<=	read_index;
+			end
+			
+			STAGE_LOAD: begin
+				if (read_index == 5'd7)
+					read_index	<=	5'b0;
+				else
+					read_index	<=	read_index + 1'b1;
 			end
 			
 			default: begin
@@ -303,7 +311,11 @@ always @(posedge clk, negedge rst_n) begin
 
 			STAGE_BIAS: begin
 				shift_idx	<=	shift_idx;
-			end			
+			end
+
+			STAGE_LOAD: begin
+				shift_idx	<=	shift_idx;
+			end
 		
 			default:
 				shift_idx	<=	shift_idx;
@@ -338,43 +350,17 @@ always @(posedge clk, negedge rst_n) begin
 				cache_array_0_7 <=	32'h0;				
 			end
 			
-			STAGE_PRELOAD: begin
-///				if (read_index == 5'd24) begin
-				
-        			case (read_index)
-        				5'd0: 	cache_array_0_0	<=	pixel_in;
-        				5'd1: 	cache_array_0_1	<=	pixel_in;
-        				5'd2: 	cache_array_0_2	<=	pixel_in;
-        				5'd3: 	cache_array_0_3	<=	pixel_in;
-        				5'd4: 	cache_array_0_4	<=	pixel_in;
-        				5'd5: 	cache_array_0_5	<=	pixel_in;
-        				5'd6: 	cache_array_0_6	<=	pixel_in;
-        				5'd7: 	cache_array_0_7	<=	pixel_in;
-        				default: begin      
-        						cache_array_0_0	<=	cache_array_0_0;
-        						cache_array_0_1 <=	cache_array_0_1;
-        						cache_array_0_2 <=	cache_array_0_2;
-        						cache_array_0_3 <=	cache_array_0_3;
-        						cache_array_0_4 <=	cache_array_0_4;
-        						cache_array_0_5 <=	cache_array_0_5;	
-        						cache_array_0_6 <=	cache_array_0_6;
-        						cache_array_0_7 <=	cache_array_0_7;
-        				end
-        			endcase	
-//				end		
-			end
-			
-			STAGE_ROW_0: begin
-				if (shift_idx == 2'b10) begin
+			STAGE_PRELOAD: begin 
+				if (read_index == 5'd7) begin
 					cache_array_0_0	<=	cache_array_1_0;
 					cache_array_0_1 <=	cache_array_1_1;
 					cache_array_0_2 <=	cache_array_1_2;
 					cache_array_0_3 <=	cache_array_1_3;
 					cache_array_0_4 <=	cache_array_1_4;
-					cache_array_0_5 <=	cache_array_1_5;
+					cache_array_0_5 <=	cache_array_1_5;	
 					cache_array_0_6 <=	cache_array_1_6;
 					cache_array_0_7 <=	cache_array_1_7;
-				end 
+				end
 				else begin
 					cache_array_0_0	<=	cache_array_0_0;
 					cache_array_0_1 <=	cache_array_0_1;
@@ -384,7 +370,18 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_0_5 <=	cache_array_0_5;
 					cache_array_0_6 <=	cache_array_0_6;
 					cache_array_0_7 <=	cache_array_0_7;
-				end				
+				end
+			end
+			
+			STAGE_ROW_0: begin
+				cache_array_0_0	<=	cache_array_0_0;
+				cache_array_0_1 <=	cache_array_0_1;
+				cache_array_0_2 <=	cache_array_0_2;
+				cache_array_0_3 <=	cache_array_0_3;
+				cache_array_0_4 <=	cache_array_0_4;
+				cache_array_0_5 <=	cache_array_0_5;
+				cache_array_0_6 <=	cache_array_0_6;
+				cache_array_0_7 <=	cache_array_0_7;			
 			end
 			
 			STAGE_ROW_1: begin
@@ -418,7 +415,30 @@ always @(posedge clk, negedge rst_n) begin
 				cache_array_0_5 <=	cache_array_0_5;
 				cache_array_0_6 <=	cache_array_0_6;
 				cache_array_0_7 <=	cache_array_0_7;
-			end	
+			end
+
+			STAGE_LOAD: begin
+				if (read_index == 5'b0) begin
+					cache_array_0_0	<=	cache_array_1_0;
+					cache_array_0_1 <=	cache_array_1_1;
+					cache_array_0_2 <=	cache_array_1_2;
+					cache_array_0_3 <=	cache_array_1_3;
+					cache_array_0_4 <=	cache_array_1_4;
+					cache_array_0_5 <=	cache_array_1_5;
+					cache_array_0_6 <=	cache_array_1_6;
+					cache_array_0_7 <=	cache_array_1_7;
+				end
+				else begin
+					cache_array_0_0	<=	cache_array_0_0;
+					cache_array_0_1 <=	cache_array_0_1;
+					cache_array_0_2 <=	cache_array_0_2;
+					cache_array_0_3 <=	cache_array_0_3;
+					cache_array_0_4 <=	cache_array_0_4;
+					cache_array_0_5 <=	cache_array_0_5;
+					cache_array_0_6 <=	cache_array_0_6;
+					cache_array_0_7 <=	cache_array_0_7;
+				end
+			end			
 						
 			default: begin
 				cache_array_0_0	<=	cache_array_0_0;
@@ -461,39 +481,16 @@ always @(posedge clk, negedge rst_n) begin
 			end	
 
 			STAGE_PRELOAD: begin
-				case (read_index)
-					5'd8: 	cache_array_1_0	<=	pixel_in;
-					5'd9: 	cache_array_1_1	<=	pixel_in;
-					5'd10: 	cache_array_1_2	<=	pixel_in;
-					5'd11: 	cache_array_1_3	<=	pixel_in;
-					5'd12: 	cache_array_1_4	<=	pixel_in;
-					5'd13: 	cache_array_1_5	<=	pixel_in;
-					5'd14: 	cache_array_1_6	<=	pixel_in;
-					5'd15: 	cache_array_1_7	<=	pixel_in;
-					default: begin      
-							cache_array_1_0	<=	cache_array_1_0;
-							cache_array_1_1 <=	cache_array_1_1;
-							cache_array_1_2 <=	cache_array_1_2;
-							cache_array_1_3 <=	cache_array_1_3;
-							cache_array_1_4 <=	cache_array_1_4;
-							cache_array_1_5 <=	cache_array_1_5;	
-							cache_array_1_6 <=	cache_array_1_6;
-							cache_array_1_7 <=	cache_array_1_7;
-					end
-				endcase
-			end			
-			
-			STAGE_ROW_0: begin
-				if (shift_idx == 2'b10) begin
+				if (read_index == 5'd7) begin			
 					cache_array_1_0	<=	cache_array_2_0;
 					cache_array_1_1 <=	cache_array_2_1;
 					cache_array_1_2 <=	cache_array_2_2;
 					cache_array_1_3 <=	cache_array_2_3;
 					cache_array_1_4 <=	cache_array_2_4;
-					cache_array_1_5 <=	cache_array_2_5;
+					cache_array_1_5 <=	cache_array_2_5;	
 					cache_array_1_6 <=	cache_array_2_6;
 					cache_array_1_7 <=	cache_array_2_7;
-				end 
+				end
 				else begin
 					cache_array_1_0	<=	cache_array_1_0;
 					cache_array_1_1 <=	cache_array_1_1;
@@ -503,7 +500,18 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_1_5 <=	cache_array_1_5;
 					cache_array_1_6 <=	cache_array_1_6;
 					cache_array_1_7 <=	cache_array_1_7;
-				end				
+				end
+			end			
+			
+			STAGE_ROW_0: begin
+				cache_array_1_0	<=	cache_array_1_0;
+				cache_array_1_1 <=	cache_array_1_1;
+				cache_array_1_2 <=	cache_array_1_2;
+				cache_array_1_3 <=	cache_array_1_3;
+				cache_array_1_4 <=	cache_array_1_4;
+				cache_array_1_5 <=	cache_array_1_5;
+				cache_array_1_6 <=	cache_array_1_6;
+				cache_array_1_7 <=	cache_array_1_7;		
 			end				
 			
 			
@@ -538,7 +546,30 @@ always @(posedge clk, negedge rst_n) begin
 				cache_array_1_5 <=	cache_array_1_5;
 				cache_array_1_6 <=	cache_array_1_6;
 				cache_array_1_7 <=	cache_array_1_7;	
-			end				
+			end
+
+			STAGE_LOAD: begin
+				if (read_index == 5'b0) begin			
+					cache_array_1_0	<=	cache_array_2_0;
+					cache_array_1_1 <=	cache_array_2_1;
+					cache_array_1_2 <=	cache_array_2_2;
+					cache_array_1_3 <=	cache_array_2_3;
+					cache_array_1_4 <=	cache_array_2_4;
+					cache_array_1_5 <=	cache_array_2_5;	
+					cache_array_1_6 <=	cache_array_2_6;
+					cache_array_1_7 <=	cache_array_2_7;
+				end
+				else begin
+					cache_array_1_0	<=	cache_array_1_0;
+					cache_array_1_1 <=	cache_array_1_1;
+					cache_array_1_2 <=	cache_array_1_2;
+					cache_array_1_3 <=	cache_array_1_3;
+					cache_array_1_4 <=	cache_array_1_4;
+					cache_array_1_5 <=	cache_array_1_5;
+					cache_array_1_6 <=	cache_array_1_6;
+					cache_array_1_7 <=	cache_array_1_7;
+				end
+			end			
 		
 			default: begin
 				cache_array_1_0	<=	cache_array_1_0;
@@ -582,14 +613,14 @@ always @(posedge clk, negedge rst_n) begin
 
 			STAGE_PRELOAD: begin
 				case (read_index)
-					5'd16: 	cache_array_2_0	<=	pixel_in;
-					5'd17: 	cache_array_2_1	<=	pixel_in;
-					5'd18: 	cache_array_2_2	<=	pixel_in;
-					5'd19: 	cache_array_2_3	<=	pixel_in;
-					5'd20: 	cache_array_2_4	<=	pixel_in;
-					5'd21: 	cache_array_2_5	<=	pixel_in;
-					5'd22: 	cache_array_2_6	<=	pixel_in;
-					5'd23: 	cache_array_2_7	<=	pixel_in;
+					5'd0: 	cache_array_2_0	<=	pixel_in;
+					5'd1: 	cache_array_2_1	<=	pixel_in;
+					5'd2: 	cache_array_2_2	<=	pixel_in;
+					5'd3: 	cache_array_2_3	<=	pixel_in;
+					5'd4: 	cache_array_2_4	<=	pixel_in;
+					5'd5: 	cache_array_2_5	<=	pixel_in;
+					5'd6: 	cache_array_2_6	<=	pixel_in;
+					5'd7: 	cache_array_2_7	<=	pixel_in;
 					default: begin      
 							cache_array_2_0	<=	cache_array_2_0;
 							cache_array_2_1 <=	cache_array_2_1;
@@ -603,76 +634,37 @@ always @(posedge clk, negedge rst_n) begin
 				endcase
 			end			
 			
-			STAGE_ROW_0: begin
-//				if (shift_idx == 2'b10 ) begin
-				if (shift_idx == 2'b10 || read_index == 5'b0111) begin				
-					case (read_index)
-						5'd0: 	cache_array_2_0	<=	pixel_in;
-						5'd1: 	cache_array_2_1	<=	pixel_in;
-						5'd2: 	cache_array_2_2	<=	pixel_in;
-						5'd3: 	cache_array_2_3	<=	pixel_in;
-						5'd4: 	cache_array_2_4	<=	pixel_in;
-						5'd5: 	cache_array_2_5	<=	pixel_in;
-						5'd6: 	cache_array_2_6	<=	pixel_in;
-						5'd7: 	cache_array_2_7	<=	pixel_in;
-						default: begin      
-							cache_array_2_0	<=	cache_array_2_0;
-							cache_array_2_1 <=	cache_array_2_1;
-							cache_array_2_2 <=	cache_array_2_2;
-							cache_array_2_3 <=	cache_array_2_3;
-							cache_array_2_4 <=	cache_array_2_4;
-							cache_array_2_5 <=	cache_array_2_5;	
-							cache_array_2_6 <=	cache_array_2_6;
-							cache_array_2_7 <=	cache_array_2_7;
-						end
-					endcase
-				end
+			STAGE_ROW_0: begin  
+				cache_array_2_0	<=	cache_array_2_0;
+				cache_array_2_1 <=	cache_array_2_1;
+				cache_array_2_2 <=	cache_array_2_2;
+				cache_array_2_3 <=	cache_array_2_3;
+				cache_array_2_4 <=	cache_array_2_4;
+				cache_array_2_5 <=	cache_array_2_5;	
+				cache_array_2_6 <=	cache_array_2_6;
+				cache_array_2_7 <=	cache_array_2_7;
 			end
 			
-			STAGE_ROW_1: begin
-				case (read_index)
-					5'd0: 	cache_array_2_0	<=	pixel_in;
-					5'd1: 	cache_array_2_1	<=	pixel_in;
-					5'd2: 	cache_array_2_2	<=	pixel_in;
-					5'd3: 	cache_array_2_3	<=	pixel_in;
-					5'd4: 	cache_array_2_4	<=	pixel_in;
-					5'd5: 	cache_array_2_5	<=	pixel_in;
-					5'd6: 	cache_array_2_6	<=	pixel_in;
-					5'd7: 	cache_array_2_7	<=	pixel_in;
-					default: begin      
-							cache_array_2_0	<=	cache_array_2_0;
-							cache_array_2_1 <=	cache_array_2_1;
-							cache_array_2_2 <=	cache_array_2_2;
-							cache_array_2_3 <=	cache_array_2_3;
-							cache_array_2_4 <=	cache_array_2_4;
-							cache_array_2_5 <=	cache_array_2_5;	
-							cache_array_2_6 <=	cache_array_2_6;
-							cache_array_2_7 <=	cache_array_2_7;
-					end
-				endcase			
+			STAGE_ROW_1: begin     
+				cache_array_2_0	<=	cache_array_2_0;
+				cache_array_2_1 <=	cache_array_2_1;
+				cache_array_2_2 <=	cache_array_2_2;
+				cache_array_2_3 <=	cache_array_2_3;
+				cache_array_2_4 <=	cache_array_2_4;
+				cache_array_2_5 <=	cache_array_2_5;	
+				cache_array_2_6 <=	cache_array_2_6;
+				cache_array_2_7 <=	cache_array_2_7;		
 			end
 			
 			STAGE_ROW_2: begin
-				case (read_index)
-					5'd0: 	cache_array_2_0	<=	pixel_in;
-					5'd1: 	cache_array_2_1	<=	pixel_in;
-					5'd2: 	cache_array_2_2	<=	pixel_in;
-					5'd3: 	cache_array_2_3	<=	pixel_in;
-					5'd4: 	cache_array_2_4	<=	pixel_in;
-					5'd5: 	cache_array_2_5	<=	pixel_in;
-					5'd6: 	cache_array_2_6	<=	pixel_in;
-					5'd7: 	cache_array_2_7	<=	pixel_in;
-					default: begin      
-							cache_array_2_0	<=	cache_array_2_0;
-							cache_array_2_1 <=	cache_array_2_1;
-							cache_array_2_2 <=	cache_array_2_2;
-							cache_array_2_3 <=	cache_array_2_3;
-							cache_array_2_4 <=	cache_array_2_4;
-							cache_array_2_5 <=	cache_array_2_5;	
-							cache_array_2_6 <=	cache_array_2_6;
-							cache_array_2_7 <=	cache_array_2_7;
-					end
-				endcase			
+				cache_array_2_0	<=	cache_array_2_0;
+				cache_array_2_1 <=	cache_array_2_1;
+				cache_array_2_2 <=	cache_array_2_2;
+				cache_array_2_3 <=	cache_array_2_3;
+				cache_array_2_4 <=	cache_array_2_4;
+				cache_array_2_5 <=	cache_array_2_5;	
+				cache_array_2_6 <=	cache_array_2_6;
+				cache_array_2_7 <=	cache_array_2_7;		
 			end
 
 			STAGE_BIAS: begin
@@ -684,7 +676,30 @@ always @(posedge clk, negedge rst_n) begin
 				cache_array_2_5 <=	cache_array_2_5;
 				cache_array_2_6 <=	cache_array_2_6;
 				cache_array_2_7 <=	cache_array_2_7;	
-			end				
+			end
+
+			STAGE_LOAD: begin
+				case (read_index)
+					5'd0: 	cache_array_2_0	<=	pixel_in;
+					5'd1: 	cache_array_2_1	<=	pixel_in;
+					5'd2: 	cache_array_2_2	<=	pixel_in;
+					5'd3: 	cache_array_2_3	<=	pixel_in;
+					5'd4: 	cache_array_2_4	<=	pixel_in;
+					5'd5: 	cache_array_2_5	<=	pixel_in;
+					5'd6: 	cache_array_2_6	<=	pixel_in;
+					5'd7: 	cache_array_2_7	<=	pixel_in;
+					default: begin      
+							cache_array_2_0	<=	cache_array_2_0;
+							cache_array_2_1 <=	cache_array_2_1;
+							cache_array_2_2 <=	cache_array_2_2;
+							cache_array_2_3 <=	cache_array_2_3;
+							cache_array_2_4 <=	cache_array_2_4;
+							cache_array_2_5 <=	cache_array_2_5;	
+							cache_array_2_6 <=	cache_array_2_6;
+							cache_array_2_7 <=	cache_array_2_7;
+					end
+				endcase
+			end			
 		
 			default: begin
 				cache_array_2_0	<=	cache_array_2_0;
@@ -807,6 +822,11 @@ always @(posedge clk, negedge rst_n) begin
 												cache_array_0_6,
 												cache_array_0_7									  
 											};	
+											
+			STAGE_LOAD: begin
+					out_kernel_port_reg	<=	{ 									  
+											};																						
+											
 			end							
 		
 			default: begin
