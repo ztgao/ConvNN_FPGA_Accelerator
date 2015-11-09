@@ -1,0 +1,96 @@
+m255
+K4
+z2
+13
+cModel Technology
+Z0 dD:/Gzt/project/conv_kernel/rtl/conv_kernel/sim
+!s112 0.1
+!i10d 8192
+!i10e 25
+!i10f 100
+T_opt
+V1WP@oY[a5Az`Y1HE1Pnnz1
+04 6 4 work tb_rom fast 0
+04 4 4 work glbl fast 0
+=1-08570092fa89-5634a1ad-1eb-1170
+o-quiet -auto_acc_if_foreign -work work -L unisims_ver -L unimacro_ver -L secureip -L work
+n@_opt
+OL;O;10.2c;57
+Z1 dD:/Gzt/project/conv_kernel/rtl/conv_kernel/sim
+!s110 1446289838
+vglbl
+Z2 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+!s85 0
+31
+IK<zg^RZ7kkQLoDdi45JY92
+Z3 dD:/Gzt/project/conv_kernel/rtl/rom_test/sim
+Z4 w1446277206
+Z5 8D:/Gzt/project/conv_kernel/rtl/rom_test/rom_64x32_sim_netlist.v
+Z6 FD:/Gzt/project/conv_kernel/rtl/rom_test/rom_64x32_sim_netlist.v
+L0 343
+Z7 OL;L;10.2c;57
+Z8 !s108 1446289782.411000
+Z9 !s107 D:/Gzt/project/conv_kernel/rtl/rom_test/rom_64x32_sim_netlist.v|
+Z10 !s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/rom_test/rom_64x32_sim_netlist.v|
+Z11 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
+!i10b 1
+!s100 Qa4L6`F<:Une=4GGg:1RF2
+!i111 0
+vrom_64x32
+R2
+r1
+31
+I6?;@OZ<P[Q@VcXM`i4RiG3
+R3
+R4
+R5
+R6
+L0 18
+R7
+R8
+R9
+R10
+R11
+!s85 0
+!i10b 1
+!s100 n3Hf3W6H>?11N41mo31;J0
+!i111 0
+vrom_64x32_dist_mem_gen_v8_0_9
+R2
+r1
+31
+I66L1WajmL]=XdBHNa8TH]3
+R3
+R4
+R5
+R6
+L0 93
+R7
+R8
+R9
+R10
+R11
+!s85 0
+!i10b 1
+!s100 >Ph;^]Yk9:bzILejnd_ac2
+!i111 0
+vtb_rom
+R2
+r1
+31
+IA?En@mF<VN47d[^fO@6Ae3
+R3
+w1446289635
+8D:/Gzt/project/conv_kernel/rtl/rom_test/tb_rom.v
+FD:/Gzt/project/conv_kernel/rtl/rom_test/tb_rom.v
+L0 3
+R7
+R11
+!s85 0
+!s100 _??GCXab^;oIED]hF27AS3
+!s108 1446289782.255000
+!s107 D:/Gzt/project/conv_kernel/rtl/rom_test/tb_rom.v|
+!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/rom_test/tb_rom.v|
+!i10b 1
+!i111 0

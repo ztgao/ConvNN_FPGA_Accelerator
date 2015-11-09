@@ -1,0 +1,405 @@
+vsim -L unisims_ver -L unimacro_ver -L secureip -L xil_defaultlib -lib xil_defaultlib -voptargs=\"+acc\" -t ns -novopt work.tb_floating_ip
+# vsim -L unisims_ver -L unimacro_ver -L secureip -L xil_defaultlib -lib xil_defaultlib -voptargs=\"+acc\" -t ns -novopt work.tb_floating_ip 
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading work.tb_floating_ip
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading work.floating_adder
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading work.floating_adder_floating_point_v7_1_0
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.LUT3
+# Loading unisims_ver.FDRE
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.LUT5
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.LUT4
+# Loading unisims_ver.LUT2
+# Loading unisims_ver.DSP48E1
+# Loading unisims_ver.LUT6
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.CARRY4
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Refreshing D:/xilinx_lib/unisims_ver.GND
+# Loading unisims_ver.GND
+# Loading unisims_ver.VCC
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.LUT1
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Refreshing D:/Gzt/project/conv_kernel/rtl/iptest/work.floating_mult
+# Loading work.floating_mult
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Refreshing D:/Gzt/project/conv_kernel/rtl/iptest/work.floating_mult_floating_point_v7_1_0
+# Loading work.floating_mult_floating_point_v7_1_0
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.SRL16E
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# ** Error: (vsim-19) Failed to access library 'xil_defaultlib' at "xil_defaultlib".
+# 
+# No such file or directory. (errno = ENOENT)
+# Loading unisims_ver.x_lut3_mux4
+# ** Fatal: Error occurred in protected context.
+#    Time: 0 ns  Iteration: 0  Protected: /tb_floating_ip/U_floating_adder/U0/i_synth/\ADDSUB_OP.ADDSUB /\SPEED_OP.DSP.OP /A_IP_DELAY/i_pipe/\opt_has_pipe.first_q_reg[0]  File: D:/Xilinx/Vivado/2015.3/data/verilog/src/unisims/FDRE.v
+# FATAL ERROR while loading design
+# Error loading design

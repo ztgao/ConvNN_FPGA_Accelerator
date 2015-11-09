@@ -1,0 +1,105 @@
+m255
+K4
+z2
+13
+cModel Technology
+dD:/Gzt/project/conv_kernel/rtl/rom_test/sim
+!s112 0.1
+!i10d 8192
+!i10e 25
+!i10f 100
+vconv_layer_pixel_cache_input
+Z0 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+!s85 0
+31
+I@Un7m[HK8aiV7?Gz4:h3m0
+Z1 dD:/Gzt/project/conv_kernel/rtl/conv_layer/sim
+w1446795606
+8D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_cache_input.v
+FD:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_cache_input.v
+L0 8
+Z2 OL;L;10.2c;57
+!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_cache_input.v|
+Z3 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
+!i10b 1
+!s100 =RAJURLV5f]d6C<Ef>f^U1
+!s108 1446795612.977000
+!s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_cache_input.v|
+!i111 0
+vglbl
+Z4 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+31
+I3NDcUVf2@mmfK0dBJ?Pg>2
+R1
+Z5 w1446360402
+Z6 8D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
+Z7 FD:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
+L0 262
+R2
+Z8 !s108 1446430481.952000
+Z9 !s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v|
+Z10 !s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v|
+R3
+!s100 ^OC6`Wd=1O85UgLUeiNSD0
+!s85 0
+!i10b 1
+!i111 0
+vrom_64x32
+R4
+r1
+31
+ILZIKCfTZoQfW`<C95n>Q:0
+R1
+R5
+R6
+R7
+L0 18
+R2
+R8
+R9
+R10
+R3
+!s100 n3Hf3W6H>?11N41mo31;J0
+!s85 0
+!i10b 1
+!i111 0
+vrom_64x32_dist_mem_gen_v8_0_9
+R4
+r1
+31
+IHfCCdQbzV`c>Em^@J]G:60
+R1
+R5
+R6
+R7
+L0 93
+R2
+R8
+R9
+R10
+R3
+!s100 _K3_8=NAFRIH5h5d1f=[22
+!s85 0
+!i10b 1
+!i111 0
+vtb_conv_layer_pixel_cache_input
+R4
+r1
+31
+IT2WLYm_oY>fB10R>N5?7]3
+R1
+w1446794501
+8D:\Gzt\project\conv_kernel\rtl\conv_layer\tb_conv_layer_cache_input.v
+FD:\Gzt\project\conv_kernel\rtl\conv_layer\tb_conv_layer_cache_input.v
+L0 5
+R2
+R3
+!s90 -reportprogress|300|-work|work|-vopt|D:\Gzt\project\conv_kernel\rtl\conv_layer\tb_conv_layer_cache_input.v|
+!s100 Ej^k1fM^:MGOXJ^26C?5F2
+!s108 1446794691.869000
+!s107 D:\Gzt\project\conv_kernel\rtl\conv_layer\tb_conv_layer_cache_input.v|
+!s85 0
+!i10b 1
+!i111 0
