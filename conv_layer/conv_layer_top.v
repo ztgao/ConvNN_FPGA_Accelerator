@@ -4,7 +4,7 @@
 // so we can calculate 12 convolution in this step.
 // The conv_kernel is 3x3.
 
-module conv_layer(
+module conv_layer_top(
 	
 	//--input
 	clk,
@@ -65,7 +65,7 @@ always @(calc_state) begin
 end
 
 
-conv_layer_pixel_cache_input U_conv_layer_pixel_cache_input_0(
+conv_layer_input_interface U_conv_layer_input_interface_0(
 // --input
 	.clk			(clk),
 	.rst_n			(rst_n),

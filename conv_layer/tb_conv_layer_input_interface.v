@@ -2,7 +2,7 @@
 // Description:
 
 `timescale 1ns/1ns
-module tb_conv_layer_pixel_cache_input;
+module tb_conv_layer_input_interface;
 
 reg clk;
 reg rst_n;
@@ -43,16 +43,16 @@ initial begin
 	#10
 	enable		=	1;
 	
-	#400
-	idle		=	1;
-	#100
-	idle		=	0;
-	#1000
+	// #400
+	// idle		=	1;
+	// #100
+	// idle		=	0;
+	#10000
 	$stop;
 end	
 	
 	
-conv_layer_pixel_cache_input U_cache_1(	
+conv_layer_input_interface U_conv_layer_input_interface_1(	
 // --input
 	.clk 			(clk),
 	.rst_n			(rst_n),
@@ -68,8 +68,8 @@ conv_layer_pixel_cache_input U_cache_1(
 );
 
 rom_64x32 U_rom_1 (
-  .a(rom_addr),      // input wire [5 : 0] a
-  .spo(data)  // output wire [31 : 0] spo
+	.a(rom_addr),      // input wire [5 : 0] a
+	.spo(data)  // output wire [31 : 0] spo
 );	
 
 endmodule

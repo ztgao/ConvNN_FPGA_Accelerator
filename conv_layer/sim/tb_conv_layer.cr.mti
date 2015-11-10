@@ -1,4 +1,11 @@
-D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
+D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module tb_conv_layer_input_interface
+
+Top level modules:
+	tb_conv_layer_input_interface
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module rom_64x32
 -- Compiling module rom_64x32_dist_mem_gen_v8_0_9
@@ -7,12 +14,5 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	rom_64x32
 	glbl
-
-} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_cache_input.v {1 {vlog -work work -vopt {D:\Gzt\project\conv_kernel\rtl\conv_layer\tb_conv_layer_cache_input.v}
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module tb_conv_layer_pixel_cache_input
-
-Top level modules:
-	tb_conv_layer_pixel_cache_input
 
 } {} {}}
