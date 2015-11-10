@@ -16,7 +16,7 @@
 // Description:
 // A data cache for pixel floating point data between DDR3 and conv kernel, 
 // functioning by a standard FSM
-// The FSM state:
+// The state transfer:
 //	
 //	|-- INIT --|-- PRELOAD --|-- SHIFT 0 1 2... --|-- BIAS --|-- LOAD --|
 //

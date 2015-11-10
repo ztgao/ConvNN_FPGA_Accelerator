@@ -31,222 +31,50 @@ parameter	BIAS				=	3'd5;
 parameter	LOAD				=	3'd6;
 parameter	IDLE				=	3'd7;
 
+parameter	ACK_IDLE			=	2'd0;
+parameter	ACK_PRELOAD_FIN		=	2'd1;
+parameter	ACK_SHIFT_FIN		=	2'd2;
+parameter	ACK_LOAD_FIN		=	2'd3;
 
+parameter	CMD_IDLE			=	2'd0;
+parameter	CMD_PRELOAD_START	=	2'd1;
+parameter	CMD_SHIFT_START		=	2'd2;
+parameter	CMD_LOAD_START		=	2'd3;
 
 input					clk;
 input					rst_n;
 input					enable;
 
-reg		[2:0]			current_state;
+reg		[1:0]			input_interface_cmd;
+wire	[1:0]			input_interface_ack;
 
-reg		[2:0]			next_state;
-
-reg		[2:0]			last_state;
-
-reg		[4:0]			read_index;
-reg		[1:0]			shift_idx;
+reg		[1:0]			weight_num;
 
 
-
+//	--	
 always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		current_state	<=	INIT;
-	end
-	else begin
-		if (enable)
-			current_state	<=	next_state;
+	if(!rst_n) 
+		input_interface_cmd	<=	2'd0; // CMD_IDLE
+	else if ( enable )
+		input_interface_cmd	<=	CMD_PRELOAD_START;
+	else if ( input_interface_ack == ACK_PRELOAD_FIN )
+		input_interface_cmd	<=	CMD_SHIFT_START;
+	else if ( input_interface_ack == ACK_SHIFT_FIN )
+		if ( weight_num == TOTAL_WEIGHT )
+			input_interface_cmd	<=	CMD_LOAD_START;
 		else
-			current_state	<= 	current_state;
-	end
+			input_interface_cmd	<=	CMD_SHIFT_START;
+	else
+		input_interface_cmd	<=	CMD_IDLE;
 end
 
-always @(current_state, read_index, shift_idx) begin
-	case (current_state)	
-		
-		INIT: begin
-				next_state	=	PRELOAD;
-		end
-		
-		PRELOAD: begin
-			if (preload_finish)
-				next_state	=	SHIFT_ROW_0;
-			else	
-				next_state	=	PRELOAD;
-		end
-		
-		SHIFT_ROW_0: begin
-			if (shift_idx	== 	2'b10)
-				next_state	=	SHIFT_ROW_1;
-			else
-				next_state	=	SHIFT_ROW_0;
-		end
-		
-		SHIFT_ROW_1: begin
-			if (shift_idx	== 	2'b10)
-				next_state	=	SHIFT_ROW_2;
-			else
-				next_state	=	SHIFT_ROW_1;			
-		end
-		
-		SHIFT_ROW_2: begin
-			if (shift_idx	== 	2'b10)
-				next_state	=	SHIFT_ROW_0;
-			else
-				next_state	=	SHIFT_ROW_2;				
-		end	
-		
-		IDLE: begin
-			if (!idle)
-				next_state 	= 	SHIFT_ROW_0;
-			else
-				next_state 	=	IDLE;
-		end
-								
-		default: begin
-			next_state	=	INIT;
-		end
-	endcase
-end
-
-//	external_rom_addr		
+//	--	
 always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		external_rom_addr		<=	6'b0;
-	end
-	else begin
-		case (current_state)
-			
-			INIT: begin
-				external_rom_addr	<=	6'b0;
-			end
-			
-			PRELOAD: begin
-				external_rom_addr	=	external_rom_addr + 1'b1;
-			end
-			
-			SHIFT_ROW_0: begin
-//				if (shift_idx == 2'b10)
-				if (shift_idx == 2'b10 || read_index == 5'b0111)
-					external_rom_addr	<=	external_rom_addr + 1'b1;
-				else
-					external_rom_addr	<=	external_rom_addr;
-			end
-			
-			SHIFT_ROW_1: begin
-				external_rom_addr	<=	external_rom_addr + 1'b1;
-			end
-			
-			SHIFT_ROW_2: begin
-				external_rom_addr	<=	external_rom_addr + 1'b1;
-			end	
-
-			IDLE: begin
-				external_rom_addr	<=	external_rom_addr;
-			end
-				
-			default: begin
-				external_rom_addr	<=	external_rom_addr;
-			end
-		endcase
-	end
-end	
-
-//	bit index in each bank
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		read_index <=	5'b0;
-	end
-	else begin
-		case (current_state)
-			
-			INIT: begin
-				read_index	<=	5'b0;
-			end
-			
-			PRELOAD: begin
-				if (read_index == 5'd23)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index + 1'b1;
-			end
-			
-			SHIFT_ROW_0: begin
-				if (shift_idx == 2'b10)
-					read_index	<=	read_index + 1'b1;
-				else if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index;					
-			end
-			
-			SHIFT_ROW_1: begin
-				if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index + 1'b1;
-			end
-			
-			SHIFT_ROW_2: begin
-				if (read_index == 5'b0111)
-					read_index	<=	5'b0;
-				else
-					read_index	<=	read_index + 1'b1;
-			end
-			
-			IDLE: begin
-				read_index	<=	read_index;
-			end
-			
-			default: begin
-				read_index	<=	read_index;
-			end
-		endcase
-	end
+	if(!rst_n) 	
+		weight_num	<=	2'd0;
+	else if ()
+		weight_num	<=	weight_num	+ 1'd1;
+	else
+		weight_num	<=	weight_num;
 end
-
-//	shift index in each cycle is 3 
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		shift_idx			<=	2'b0;
-	end
-	else begin
-		case (current_state)
-			
-			INIT: begin
-				shift_idx	<=	2'b0;
-			end
-			
-			PRELOAD: begin
-				shift_idx	<=	2'b0;
-			end
-			
-			SHIFT_ROW_0: begin
-				if (shift_idx == 2'b10)
-					shift_idx	<=	2'b0;
-				else
-					shift_idx	<=	shift_idx + 2'b1;
-			end
-			
-			SHIFT_ROW_1: begin
-				if (shift_idx == 2'b10)
-					shift_idx	<=	2'b0;
-				else
-					shift_idx	<=	shift_idx + 2'b1;
-			end
-			
-			SHIFT_ROW_2: begin
-				if (shift_idx == 2'b10)
-					shift_idx	<=	2'b0;
-				else
-					shift_idx	<=	shift_idx + 2'b1;
-			end
-
-			IDLE: begin
-				shift_idx	<=	shift_idx;
-			end			
 		
-			default:
-				shift_idx	<=	shift_idx;
-		endcase
-	end
-end
