@@ -38,16 +38,16 @@ input							enable;
 //input	[WIDTH-1:0]				data_in;
 //input	[WIDTH-1:0]				weight_in;
 
-//output	[WIDTH-1:0]				feature;
+output	[ARRAY_SIZE*WIDTH-1:0]	feature;
 output	[ARRAY_SIZE*WIDTH-1:0]	o_pixel_bus;
 output	[5:0]					rom_addr;
 
 //	register connected to covolution kernel
 
 reg		[ARRAY_SIZE*WIDTH-1:0]	i_pixel_bus;
-reg		[WIDTH-1:0]				i_weight;
+wire	[WIDTH-1:0]				i_weight;
 
-reg		[3:0]					calc_counter;
+reg		[2:0]					current_state;
 
 wire	[1:0]					input_interface_cmd;
 wire	[1:0]					input_interface_ack;
@@ -68,17 +68,17 @@ conv_layer_input_interface U_conv_layer_input_interface_0(
 	
 );
 
-/* conv_kernel_array U_conv_kernel_array_0(
+conv_kernel_array U_conv_kernel_array_0(
 	//--input
 	.clk			(clk),
 	.rst_n			(rst_n),
-	.i_pixel_bus	(i_pixel_bus),
+	.i_pixel_bus	(o_pixel_bus),
 	.i_weight		(i_weight),
 		
 	//--output	
-	.o_pixel_bus	(o_pixel_bus)
+	.o_pixel_bus	(feature)
 	
-); */
+);
 
 conv_layer_controller U_conv_layer_controller_0(
 	
@@ -89,10 +89,28 @@ conv_layer_controller U_conv_layer_controller_0(
 	.input_interface_ack	(input_interface_ack),
 	
 	//--output
-	.input_interface_cmd	(input_interface_cmd)
+	.input_interface_cmd	(input_interface_cmd),
+	.current_state			(current_state)
 //	.kernel_array_cmd		(),
 //	.output_inteface_cmd	(),
 );
+
+conv_weight_cache U_conv_weight_cache_0(
+	//--input
+	.clk				(clk),
+	.rst_n				(rst_n),
+	.current_state		(current_state),
+	// a signal to indicate the send state, eg. stop, hold or change the rom_addr
+	//--output
+	.o_weight			(i_weight)
+		
+);
+
+// conv_layer_output_interface U_conv_layer_output_interface_0(
+// );
+
+// activation_layer
+
 
 
 endmodule
