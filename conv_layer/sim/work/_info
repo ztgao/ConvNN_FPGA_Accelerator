@@ -8,27 +8,46 @@ dD:/Gzt/project/conv_kernel/rtl/rom_test/sim
 !i10d 8192
 !i10e 25
 !i10f 100
-vconv_layer_input_interface
+vconv_layer_controller
 Z0 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+31
+I<a1T7CCof^65D`6Yz5j9K2
+Z1 dD:/Gzt/project/conv_kernel/rtl/conv_layer/sim
+w1447230419
+8D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v
+FD:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v
+L0 4
+Z2 OL;L;10.2c;57
+Z3 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
+!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v|
+!s100 ZKjHEgRM2U9bYUfD<4oI<3
+!s108 1447230425.721000
+!s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v|
+!s85 0
+!i10b 1
+!i111 0
+vconv_layer_input_interface
+Z4 V`JN@9S9cnhjKRR_L]QIcM3
 r1
 !s85 0
 31
-IS^cYZ=0n5]MRS>BbFfbY^2
-Z1 dD:/Gzt/project/conv_kernel/rtl/conv_layer/sim
-w1447140141
+I>6R^<fAAFG[cZbZ28TOlk3
+R1
+w1447231834
 8D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v
 FD:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v
-L0 10
-Z2 OL;L;10.2c;57
+L0 24
+R2
 !s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v|
-Z3 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
+R3
 !i10b 1
-!s100 =HCUMaVEIbERo@fhB6=Be3
-!s108 1447140145.660000
+!s100 k[]1<FS6Cf5Yg@LbD[F6=3
+!s108 1447231837.548000
 !s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v|
 !i111 0
 vconv_layer_pixel_cache_input
-Z4 V`JN@9S9cnhjKRR_L]QIcM3
+R4
 r1
 31
 I@Un7m[HK8aiV7?Gz4:h3m0
@@ -46,6 +65,25 @@ R3
 !s85 0
 !i10b 1
 !i111 0
+vconv_layer_top
+R4
+r1
+31
+I<9bHHdj9_f8QX>H3]oG9e3
+R1
+w1447231182
+8D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.v
+FD:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.v
+L0 7
+R2
+R3
+!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.v|
+!s100 OG0VEJ02^PDaXj]2JM1e12
+!s108 1447231188.767000
+!s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.v|
+!s85 0
+!i10b 1
+!i111 0
 vglbl
 R4
 r1
@@ -57,7 +95,7 @@ Z6 8D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
 Z7 FD:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v
 L0 262
 R2
-Z8 !s108 1447134525.811000
+Z8 !s108 1447209752.996000
 Z9 !s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v|
 Z10 !s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/rom_64x32_sim_netlist.v|
 R3
@@ -115,9 +153,9 @@ FD:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v
 L0 5
 R2
 R3
-!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v|
 !s100 R6jz<LPd=^Ii2jI:?FYRd2
-!s108 1447137280.496000
+!s90 -reportprogress|300|-work|work|-vopt|D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v|
+!s108 1447209753.231000
 !s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_input_interface.v|
 !s85 0
 !i10b 1
@@ -141,4 +179,26 @@ R3
 !s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_cache_input.v|
 !i10b 1
 !s85 0
+!i111 0
+vtb_conv_layer_top
+DXx6 sv_std 3 std 0 22 `a<MJET1=lN@jzbA7kHm;1
+R4
+r1
+31
+Ii`2F76`zT1iglNDYfk[nU1
+S1
+R1
+w1447217028
+8D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv
+FD:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv
+L0 5
+R2
+o-work work -sv -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
+!s105 tb_conv_layer_top_sv_unit
+!s90 -reportprogress|300|-work|work|-vopt|-sv|D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv|
+!s100 hlSLe1kHN4d;7hlmc0zU@1
+!s108 1447217035.436000
+!s107 D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv|
+!s85 0
+!i10b 1
 !i111 0

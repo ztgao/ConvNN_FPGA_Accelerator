@@ -79,7 +79,7 @@ assign	out_kernel_port		=	out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:(IMAGE_SIZE-ARR
 output	[ADDR_WIDTH-1:0] 	rom_addr;
 reg		[ADDR_WIDTH-1:0] 	rom_addr;
 
-output	[2:0]				current_state;
+// output	[2:0]				current_state;
 reg		[2:0]				current_state;
 
 reg		[2:0]				next_state;
@@ -91,8 +91,8 @@ reg		[1:0]				shift_idx;
 
 reg		[1:0]				preload_cycle;
 
-output	[2:0]				weight_set_counter;
-reg		[2:0]				weight_set_counter;
+// output	[2:0]				weight_set_counter;
+// reg		[2:0]				weight_set_counter;
 
 output	[1:0]				ack; 
 reg		[1:0]				ack; 
@@ -162,10 +162,10 @@ always @(current_state, read_index, shift_idx, preload_cycle,cmd) begin
 					next_state	=	STAGE_ROW_0;
 				end
 				else begin
-					if ( preload_cycle == 2'b11)
-						next_state	=	STAGE_IDLE;
-					else
+					if ( preload_cycle < 2'b11)
 						next_state	=	STAGE_PRELOAD;
+					else
+						next_state	=	STAGE_IDLE;
 				end
 			end
 			
@@ -200,11 +200,12 @@ always @(current_state, read_index, shift_idx, preload_cycle,cmd) begin
 			end
 			
 			STAGE_LOAD: begin
-				if ( cmd == CMD_SHIFT_START )
-					next_state	=	STAGE_ROW_0;
-				else if
+				if ( read_index == 5'd7 )
+					next_state	=	STAGE_IDLE;
+				else if ( cmd == CMD_SHIFT_START )
+					next_state	=	STAGE_ROW_0;				 
+				else
 					next_state	=	STAGE_LOAD;
-				end
 			end
 	//  Caution: whenever add a new state which could go into IDLE, should add the exit for this state.		
 			STAGE_IDLE: begin
@@ -279,35 +280,17 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					ack		<=	ACK_IDLE;
 			end
+			
+			STAGE_IDLE: 
+				ack		<=	ACK_IDLE;
 				
 			default: begin
-				ack	<=	ack;
+				ack		<=	ACK_IDLE;
 			end
 		endcase
 	end
 end	
 		
-
-
-
-/* always @(posedge clk, negedge rst_n) begin
-	if(!rst_n)
-		weight_set_counter	<=	3'b0;
-	else if (current_state == STAGE_ROW_2)
-		if(shift_idx == 2'b10)
-			weight_set_counter	<=	weight_set_counter + 1'b1;
-		else
-			weight_set_counter	<=	weight_set_counter;
-	else if (current_state == STAGE_BIAS)
-		if (weight_set_counter == WEIGHT_SET)
-			weight_set_counter	<=	3'b0;
-		else
-			weight_set_counter	<=	weight_set_counter;
-	else
-		weight_set_counter	<=	weight_set_counter;	
-end */
-			
-
 //	rom_addr		
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
@@ -347,9 +330,13 @@ always @(posedge clk, negedge rst_n) begin
 				rom_addr	<=	rom_addr + 1'b1;
 			end
 				
+			STAGE_IDLE: begin
+				rom_addr	<=	rom_addr;
+			end	
+				
 			default: begin
 				rom_addr	<=	rom_addr;
-			end
+			end			
 		endcase
 	end
 end		
@@ -395,6 +382,10 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					read_index	<=	read_index + 1'b1;
 			end
+			
+			STAGE_IDLE: begin
+				read_index	<=	read_index;
+			end			
 			
 			default: begin
 				read_index	<=	read_index;
@@ -447,6 +438,10 @@ always @(posedge clk, negedge rst_n) begin
 			STAGE_LOAD: begin
 				shift_idx	<=	shift_idx;
 			end
+			
+			STAGE_IDLE: begin
+				shift_idx	<=	shift_idx;
+			end			
 		
 			default:
 				shift_idx	<=	shift_idx;
@@ -571,6 +566,17 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_0_6 <=	cache_array_0_6;
 					cache_array_0_7 <=	cache_array_0_7;
 				end
+			end
+
+			STAGE_IDLE: begin
+				cache_array_0_0	<=	cache_array_0_0;
+				cache_array_0_1 <=	cache_array_0_1;
+				cache_array_0_2 <=	cache_array_0_2;
+				cache_array_0_3 <=	cache_array_0_3;
+				cache_array_0_4 <=	cache_array_0_4;
+				cache_array_0_5 <=	cache_array_0_5;
+				cache_array_0_6 <=	cache_array_0_6;
+				cache_array_0_7 <=	cache_array_0_7;
 			end			
 						
 			default: begin
@@ -704,6 +710,17 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_1_6 <=	cache_array_1_6;
 					cache_array_1_7 <=	cache_array_1_7;
 				end
+			end
+
+			STAGE_IDLE: begin
+				cache_array_1_0	<=	cache_array_1_0;
+				cache_array_1_1 <=	cache_array_1_1;
+				cache_array_1_2 <=	cache_array_1_2;
+				cache_array_1_3 <=	cache_array_1_3;
+				cache_array_1_4 <=	cache_array_1_4;
+				cache_array_1_5 <=	cache_array_1_5;
+				cache_array_1_6 <=	cache_array_1_6;
+				cache_array_1_7 <=	cache_array_1_7;
 			end			
 		
 			default: begin
@@ -834,6 +851,17 @@ always @(posedge clk, negedge rst_n) begin
 							cache_array_2_7 <=	cache_array_2_7;
 					end
 				endcase
+			end
+
+			STAGE_IDLE: begin
+				cache_array_2_0	<=	cache_array_2_0;
+				cache_array_2_1 <=	cache_array_2_1;
+				cache_array_2_2 <=	cache_array_2_2;
+				cache_array_2_3 <=	cache_array_2_3;
+				cache_array_2_4 <=	cache_array_2_4;
+				cache_array_2_5 <=	cache_array_2_5;
+				cache_array_2_6 <=	cache_array_2_6;
+				cache_array_2_7 <=	cache_array_2_7;
 			end			
 		
 			default: begin
@@ -940,8 +968,20 @@ always @(posedge clk, negedge rst_n) begin
 												32'b0,
 												32'b0,
 												32'b0
-											};																						
-											
+											};
+			end									
+
+			STAGE_IDLE: begin
+					out_kernel_port_reg	<=	{	32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0
+											};
+																						
 			end							
 		
 			default: begin

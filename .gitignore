@@ -4,4 +4,5 @@
 
 
 work/*
-/sim/wave.do
+/sim/vsim.wlf
+work/

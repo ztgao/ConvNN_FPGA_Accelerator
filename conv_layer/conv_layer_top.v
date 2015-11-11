@@ -13,8 +13,8 @@ module conv_layer_top(
 	enable,
 	
 	//--output
-	o_pixel_bus	// 6x32bit
-	
+	o_pixel_bus,	// 6x32bit
+	rom_addr
 );
 
 parameter	WIDTH				=	32;
@@ -35,11 +35,12 @@ input							rst_n;
 input	[WIDTH-1:0]				pixel_in;
 input							enable;
 
-input	[WIDTH-1:0]				data_in;
+//input	[WIDTH-1:0]				data_in;
 //input	[WIDTH-1:0]				weight_in;
 
-output	[WIDTH-1:0]				feature;
+//output	[WIDTH-1:0]				feature;
 output	[ARRAY_SIZE*WIDTH-1:0]	o_pixel_bus;
+output	[5:0]					rom_addr;
 
 //	register connected to covolution kernel
 
@@ -48,21 +49,8 @@ reg		[WIDTH-1:0]				i_weight;
 
 reg		[3:0]					calc_counter;
 
-//	if all the pixels are sent, the next cycle should be 
-//  * should consider the logic
-always @(calc_state) begin
-	if (calc_state == IDLE) begin
-		i_pixel_bus	=  {32'b1,
-						32'b1,
-						32'b1,
-						32'b1,
-						32'b1,
-						32'b1};
-	end
-	else begin
-		i_pixel_bus = cache_output_bus;
-	end
-end
+wire	[1:0]					input_interface_cmd;
+wire	[1:0]					input_interface_ack;
 
 
 conv_layer_input_interface U_conv_layer_input_interface_0(
@@ -71,15 +59,16 @@ conv_layer_input_interface U_conv_layer_input_interface_0(
 	.rst_n			(rst_n),
 	.enable			(enable),
 	.pixel_in		(pixel_in),
+	.cmd			(input_interface_cmd),
+	.ack			(input_interface_ack),
 
 // --output
 	.rom_addr		(rom_addr),
-	.out_kernel_port(cache_output_bus),
-	.current_state	(calc_state)
+	.out_kernel_port(o_pixel_bus)
 	
 );
 
-conv_kernel_array U_conv_kernel_array_0(
+/* conv_kernel_array U_conv_kernel_array_0(
 	//--input
 	.clk			(clk),
 	.rst_n			(rst_n),
@@ -89,9 +78,21 @@ conv_kernel_array U_conv_kernel_array_0(
 	//--output	
 	.o_pixel_bus	(o_pixel_bus)
 	
+); */
+
+conv_layer_controller U_conv_layer_controller_0(
+	
+	//--input
+	.clk			(clk),
+	.rst_n			(rst_n),
+	.enable			(enable),
+	.input_interface_ack	(input_interface_ack),
+	
+	//--output
+	.input_interface_cmd	(input_interface_cmd)
+//	.kernel_array_cmd		(),
+//	.output_inteface_cmd	(),
 );
 
 
-
-
-
+endmodule
