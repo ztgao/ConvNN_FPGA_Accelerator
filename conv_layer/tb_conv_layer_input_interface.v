@@ -62,8 +62,8 @@ conv_layer_input_interface U_conv_layer_input_interface_1(
 	
 // --output
 	.rom_addr		(rom_addr),
-	.out_kernel_port(out_kernel_port),
-	.current_state	(current_state)
+	.out_kernel_port(out_kernel_port)
+//	.current_state	(current_state)
 	
 );
 

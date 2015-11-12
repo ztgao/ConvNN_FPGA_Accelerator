@@ -18,12 +18,22 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cmd
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ack
 add wave -noupdate -divider {New Divider}
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_0
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_1
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_2
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_3
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_4
-add wave -noupdate -radix unsigned /tb_conv_layer_top/out_kernel_port_0_5
+add wave -noupdate -divider {New Divider}
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_0
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_1
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_2
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_3
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_4
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_5
+add wave -noupdate -divider {New Divider}
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/i_weight_observe
+add wave -noupdate -divider {New Divider}
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_0
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_1
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_2
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_3
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_4
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_5
 add wave -noupdate -divider {New Divider}
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/clk
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/rst_n
@@ -61,10 +71,11 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cache_array_2_5
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cache_array_2_6
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cache_array_2_7
+add wave -noupdate -divider {New Divider}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {303261 ps} 0}
+WaveRestoreCursors {{Cursor 1} {337643 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 155
+configure wave -namecolwidth 191
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -78,4 +89,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {85890 ps} {744110 ps}
+WaveRestoreZoom {195648 ps} {482358 ps}

@@ -14,7 +14,8 @@ module conv_layer_top(
 	
 	//--output
 	o_pixel_bus,	// 6x32bit
-	rom_addr
+	rom_addr,
+	feature
 );
 
 parameter	WIDTH				=	32;
@@ -47,7 +48,8 @@ output	[5:0]					rom_addr;
 reg		[ARRAY_SIZE*WIDTH-1:0]	i_pixel_bus;
 wire	[WIDTH-1:0]				i_weight;
 
-reg		[2:0]					current_state;
+wire	[2:0]					current_state;
+wire	[2:0]					interface_state;
 
 wire	[1:0]					input_interface_cmd;
 wire	[1:0]					input_interface_ack;
@@ -63,6 +65,7 @@ conv_layer_input_interface U_conv_layer_input_interface_0(
 	.ack			(input_interface_ack),
 
 // --output
+	.current_state	(interface_state),
 	.rom_addr		(rom_addr),
 	.out_kernel_port(o_pixel_bus)
 	
@@ -99,12 +102,13 @@ conv_weight_cache U_conv_weight_cache_0(
 	//--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.current_state		(current_state),
+	.current_state		(interface_state),
 	// a signal to indicate the send state, eg. stop, hold or change the rom_addr
 	//--output
 	.o_weight			(i_weight)
 		
 );
+
 
 // conv_layer_output_interface U_conv_layer_output_interface_0(
 // );
@@ -112,5 +116,52 @@ conv_weight_cache U_conv_weight_cache_0(
 // activation_layer
 
 
+/////////////////////////////////////////////////////////////////////////////
+// A type cast module for IEEE-754 to real. 
+// When synthesize the project in Vivado, please turn off it.
+
+//	--
+shortreal		o_pixel_bus_observe_0;
+shortreal		o_pixel_bus_observe_1;
+shortreal		o_pixel_bus_observe_2;
+shortreal		o_pixel_bus_observe_3;
+shortreal		o_pixel_bus_observe_4;
+shortreal		o_pixel_bus_observe_5;
+
+always @(o_pixel_bus) begin
+	o_pixel_bus_observe_0	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-0)*WIDTH-1:(ARRAY_SIZE-1)*WIDTH]);
+	o_pixel_bus_observe_1	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-1)*WIDTH-1:(ARRAY_SIZE-2)*WIDTH]);
+	o_pixel_bus_observe_2	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-2)*WIDTH-1:(ARRAY_SIZE-3)*WIDTH]);
+	o_pixel_bus_observe_3	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-3)*WIDTH-1:(ARRAY_SIZE-4)*WIDTH]);
+	o_pixel_bus_observe_4	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-4)*WIDTH-1:(ARRAY_SIZE-5)*WIDTH]);
+	o_pixel_bus_observe_5	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-5)*WIDTH-1:(ARRAY_SIZE-6)*WIDTH]);	
+end
+
+
+//	--
+shortreal		i_weight_observe;
+
+always @(i_weight) begin
+	i_weight_observe		=	$bitstoshortreal(i_weight);
+end
+
+//	--	
+shortreal		feature_observe_0;
+shortreal		feature_observe_1;
+shortreal		feature_observe_2;
+shortreal		feature_observe_3;
+shortreal		feature_observe_4;
+shortreal		feature_observe_5;
+
+always @(feature) begin
+	feature_observe_0		=	$bitstoshortreal(feature[(ARRAY_SIZE-0)*WIDTH-1:(ARRAY_SIZE-1)*WIDTH]);
+	feature_observe_1		=	$bitstoshortreal(feature[(ARRAY_SIZE-1)*WIDTH-1:(ARRAY_SIZE-2)*WIDTH]);
+	feature_observe_2       =	$bitstoshortreal(feature[(ARRAY_SIZE-2)*WIDTH-1:(ARRAY_SIZE-3)*WIDTH]);
+	feature_observe_3       =	$bitstoshortreal(feature[(ARRAY_SIZE-3)*WIDTH-1:(ARRAY_SIZE-4)*WIDTH]);
+	feature_observe_4       =	$bitstoshortreal(feature[(ARRAY_SIZE-4)*WIDTH-1:(ARRAY_SIZE-5)*WIDTH]);
+	feature_observe_5       =	$bitstoshortreal(feature[(ARRAY_SIZE-5)*WIDTH-1:(ARRAY_SIZE-6)*WIDTH]);	
+end
+
+/////////////////////////////////////////////////////////////////////////////
 
 endmodule

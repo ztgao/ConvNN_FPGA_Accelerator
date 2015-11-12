@@ -31,6 +31,7 @@ module conv_layer_input_interface(
 	ack,
 	
 // --output
+	current_state,
 	rom_addr,
 	out_kernel_port
 );
@@ -62,6 +63,8 @@ parameter	CMD_PRELOAD_START	=	2'd1;
 parameter	CMD_SHIFT_START		=	2'd2;
 parameter	CMD_LOAD_START		=	2'd3;
 
+parameter	FLOAT32_ONE			=	32'h3F800000;
+
 
 input					clk;
 input					rst_n;
@@ -79,7 +82,7 @@ assign	out_kernel_port		=	out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:(IMAGE_SIZE-ARR
 output	[ADDR_WIDTH-1:0] 	rom_addr;
 reg		[ADDR_WIDTH-1:0] 	rom_addr;
 
-// output	[2:0]				current_state;
+output	[2:0]				current_state;
 reg		[2:0]				current_state;
 
 reg		[2:0]				next_state;
@@ -948,14 +951,14 @@ always @(posedge clk, negedge rst_n) begin
 			end	
 
 			STAGE_BIAS: begin
-					out_kernel_port_reg	<=	{ 	32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1									  
+					out_kernel_port_reg	<=	{ 	FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE									  
 											};
 			end
 											
@@ -991,8 +994,5 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-// A type cast module for IEEE-754 to real. 
-// When synthesize the project in Vivado, please turn off it.
-
-
 endmodule
+
