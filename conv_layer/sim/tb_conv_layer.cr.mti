@@ -29,6 +29,13 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	tb_conv_layer_top
 
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.v
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module conv_layer_input_interface
+
+Top level modules:
+	conv_layer_input_interface
+
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_layer_controller
