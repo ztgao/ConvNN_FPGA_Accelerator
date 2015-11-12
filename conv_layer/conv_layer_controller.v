@@ -11,6 +11,7 @@ module conv_layer_controller(
 	
 	//--output
 	input_interface_cmd,
+	current_state
 //	kernel_array_cmd,
 //	output_inteface_cmd,
 );
@@ -55,6 +56,7 @@ reg		[1:0]			input_interface_cmd;
 
 reg		[1:0]			weight_num;
 
+output	[2:0]				current_state;
 reg		[2:0]				current_state;
 reg		[2:0]				next_state;
 

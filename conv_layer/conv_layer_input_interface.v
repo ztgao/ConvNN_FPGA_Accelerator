@@ -991,4 +991,8 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
+// A type cast module for IEEE-754 to real. 
+// When synthesize the project in Vivado, please turn off it.
+
+
 endmodule
