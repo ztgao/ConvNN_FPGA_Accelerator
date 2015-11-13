@@ -44,6 +44,7 @@ parameter	CMD_SHIFT_START		=	2'd2;
 parameter	CMD_LOAD_START		=	2'd3;
 
 parameter	TOTAL_WEIGHT		=	4;
+parameter	TOTAL_SHIFT			=	ARRAY_SIZE;
 
 input					clk;
 input					rst_n;
@@ -54,11 +55,12 @@ input	[1:0]			input_interface_ack;
 output 	[1:0]			input_interface_cmd;
 reg		[1:0]			input_interface_cmd;
 
-reg		[1:0]			weight_num;
+reg		[1:0]			weight_cycle;
+reg		[2:0]			shift_cycle;
 
-output	[2:0]				current_state;
-reg		[2:0]				current_state;
-reg		[2:0]				next_state;
+output	[2:0]			current_state;
+reg		[2:0]			current_state;
+reg		[2:0]			next_state;
 
 parameter	STAGE_INIT			=	3'd0;
 parameter	STAGE_PRELOAD		=	3'd1;	
@@ -78,7 +80,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-always @(current_state, input_interface_ack, weight_num) begin
+always @(current_state, input_interface_ack, weight_cycle) begin
 	case (current_state)
 		STAGE_INIT: begin
 			next_state	=	STAGE_PRELOAD;
@@ -93,8 +95,12 @@ always @(current_state, input_interface_ack, weight_num) begin
 		
 		STAGE_SHIFT: begin
 			if ( input_interface_ack == ACK_SHIFT_FIN ) begin
-				if ( weight_num == TOTAL_WEIGHT - 1  )
-					next_state	=	STAGE_LOAD;
+				if ( weight_cycle == TOTAL_WEIGHT - 1  ) begin
+					if ( shift_cycle  == TOTAL_SHIFT - 1 )
+						next_state	<=	STAGE_PRELOAD;
+					else
+						next_state	=	STAGE_LOAD;
+				end
 				else
 					next_state	=	STAGE_SHIFT;
 			end
@@ -130,8 +136,12 @@ always @(posedge clk, negedge rst_n) begin
 					
 			STAGE_SHIFT:
 				if ( input_interface_ack == ACK_SHIFT_FIN) begin
-					if ( weight_num == TOTAL_WEIGHT-1 )
-						input_interface_cmd	<=	CMD_LOAD_START;
+					if ( weight_cycle == TOTAL_WEIGHT - 1 ) begin
+						if ( shift_cycle  == TOTAL_SHIFT - 1 )
+							input_interface_cmd	<=	CMD_PRELOAD_START;
+						else
+							input_interface_cmd	<=	CMD_LOAD_START;
+					end	
 					else
 						input_interface_cmd	<=	CMD_SHIFT_START;
 				end
@@ -150,37 +160,31 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-
-//	--	
-// always @(posedge clk, negedge rst_n) begin
-	// if(!rst_n) 
-		// input_interface_cmd	<=	CMD_IDLE; // 2'd0
-	// else if ( enable && input_interface_ack == CMD_IDLE)
-		// input_interface_cmd	<=	CMD_PRELOAD_START;
-	// else if ( input_interface_cmd == )
-	// else if ( input_interface_ack == ACK_PRELOAD_FIN )
-		// input_interface_cmd	<=	CMD_SHIFT_START;
-	// else if ( input_interface_ack == ACK_SHIFT_FIN )
-		// if ( weight_num == TOTAL_WEIGHT )
-			// input_interface_cmd	<=	CMD_LOAD_START;
-		// else
-			// input_interface_cmd	<=	CMD_SHIFT_START;
-	// else
-		// input_interface_cmd	<=	CMD_IDLE;
-// end
-
 //	--	
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
-		weight_num	<=	2'd0;
+		weight_cycle	<=	2'd0;
 	else if ( input_interface_ack == ACK_SHIFT_FIN) begin
-		if ( weight_num == TOTAL_WEIGHT - 1 )
-			weight_num	<=	2'd0;
+		if ( weight_cycle == TOTAL_WEIGHT - 1 )
+			weight_cycle	<=	2'd0;
 		else
-			weight_num	<=	weight_num	+ 1'd1;
+			weight_cycle	<=	weight_cycle	+ 1'd1;
 	end 
 	else
-		weight_num	<=	weight_num;	
+		weight_cycle	<=	weight_cycle;	
+end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 	
+		shift_cycle		<=	3'd0;
+	else if (input_interface_ack == ACK_SHIFT_FIN) begin
+		if ( weight_cycle == TOTAL_WEIGHT - 1)
+			shift_cycle		<=	shift_cycle	+ 1'b1;
+		else
+			shift_cycle		<=	shift_cycle;
+	end
+	else if ( shift_cycle == TOTAL_SHIFT)
+		shift_cycle		<=	3'd0;
 end
 
 endmodule

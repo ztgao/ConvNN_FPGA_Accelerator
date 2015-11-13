@@ -77,6 +77,7 @@ conv_kernel_array U_conv_kernel_array_0(
 	.rst_n			(rst_n),
 	.i_pixel_bus	(o_pixel_bus),
 	.i_weight		(i_weight),
+	.current_state	(interface_state),
 		
 	//--output	
 	.o_pixel_bus	(feature)

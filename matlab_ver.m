@@ -10,10 +10,16 @@ image_0 	= [	0.0,	0.1,	0.2,	0.3,	0.4,	0.5,	0.6,	0.7;
 weight_0	= [ 0.0,	0.1,	0.2;
 				0.3,	0.4,	0.5;					
 				0.6,	0.7,	0.8];
-bias_0      =   0.9;       
+weight_1    = [ 1.0,	1.1,	1.2;
+				1.3,	1.4,	1.5;					
+				1.6,	1.7,	1.8];         
+            
+bias_0      =   0.9; 
+bias_1      =   1.9;
 %weight_0    =   rot90(weight_0); 
 %weight_0    =   weight_0'; 
 weight_0	=	flipud(fliplr(weight_0));
-				
+weight_1	=	flipud(fliplr(weight_1));				
 feature_0	=	conv2(image_0,weight_0,'valid') + bias_0
+feature_1	=	conv2(image_0,weight_1,'valid') + bias_1
 

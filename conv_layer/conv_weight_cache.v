@@ -54,7 +54,7 @@ always @(posedge clk, negedge rst_n) begin
 		rom_addr	<=	6'b0 ;
 	else if (current_state 	== 	STAGE_ROW_0 || current_state == STAGE_ROW_1 || current_state == STAGE_ROW_2 || current_state == STAGE_BIAS)	// ?!
 		rom_addr	<=	rom_addr + 1 ;
-	else if (current_state	==	STAGE_LOAD)
+	else if (current_state	==	STAGE_LOAD || current_state == STAGE_PRELOAD)
 		rom_addr	<=	6'b0 ;
 	else
 		rom_addr	<=	rom_addr;

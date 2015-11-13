@@ -2,6 +2,7 @@
 module conv_kernel(
 	clk,
 	rst_n,
+	clear,
 	i_pixel,
 	i_weight,
 	o_pixel
@@ -12,6 +13,7 @@ parameter	WIDTH	=	32;
 
 input					clk;
 input					rst_n;
+input					clear;
 input	[WIDTH-1:0]		i_pixel;
 input	[WIDTH-1:0]		i_weight;
 
@@ -33,6 +35,10 @@ always @(posedge clk, negedge rst_n)	begin
 		mult_a		<=	32'b0;
 		mult_b		<=	32'b0;
 	end
+	// else if (clear) begin
+		// mult_a		<=	32'b0;
+		// mult_b		<=	32'b0;
+	// end	
 	else begin
 		mult_a		<=	i_pixel;
 		mult_b		<=	i_weight;
@@ -44,6 +50,10 @@ always @(posedge clk, negedge rst_n)	begin
 		add_a		<=	32'b0;
 		add_b		<=	32'b0;
 	end
+	else if (clear) begin
+		add_a		<=	32'b0;
+		add_b		<=	32'b0;
+	end			
 	else begin
 		add_a		<=	product;
 		add_b		<=	sum;
@@ -54,6 +64,9 @@ always @(posedge clk, negedge rst_n)	begin
 	if(!rst_n) begin
 		o_pixel		<=	32'b0;
 //		o_pixel_reg	<=	32'b0;
+	end
+	else if (clear) begin
+		o_pixel		<=	32'b0;
 	end
 	else begin
 		o_pixel		<=	sum;

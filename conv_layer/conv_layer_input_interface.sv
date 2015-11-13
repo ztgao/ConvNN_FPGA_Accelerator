@@ -238,8 +238,10 @@ always @(posedge clk, negedge rst_n) begin
 		else
 			preload_cycle	<=	preload_cycle;
 	end
+	else if (preload_cycle	==	2'b11)
+		preload_cycle	<=	2'b0;
 	else
-		preload_cycle <=	preload_cycle;
+		preload_cycle 	<=	preload_cycle;
 end
 
 //	-- ack

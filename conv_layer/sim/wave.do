@@ -18,6 +18,7 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cmd
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ack
 add wave -noupdate -divider {New Divider}
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/clear_delay_2
 add wave -noupdate -divider {New Divider}
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_0
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_1
@@ -72,8 +73,19 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cache_array_2_6
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cache_array_2_7
 add wave -noupdate -divider {New Divider}
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/clk
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/rst_n
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/i_pixel
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/i_weight
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/o_pixel
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/mult_a
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/mult_b
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/product
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/add_a
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/add_b
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_kernel_array_0/U_conv_kernel_0_0/sum
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {337643 ps} 0}
+WaveRestoreCursors {{Cursor 1} {571682 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 191
 configure wave -valuecolwidth 100
@@ -89,4 +101,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {195648 ps} {482358 ps}
+WaveRestoreZoom {322508 ps} {651618 ps}
