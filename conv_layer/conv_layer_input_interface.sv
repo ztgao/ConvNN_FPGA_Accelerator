@@ -20,7 +20,7 @@
 //	
 //	|-- INIT --|-- PRELOAD --|-- SHIFT 0 1 2... --|-- BIAS --|-- LOAD --|
 //
-
+`include "../../global_define.v"
 module conv_layer_input_interface(	
 // --input
 	clk,
@@ -36,13 +36,7 @@ module conv_layer_input_interface(
 	out_kernel_port
 );
 
-parameter	WIDTH				=	32;
-parameter	KERNEL_SIZE			=	3;	//3x3
-parameter	IMAGE_SIZE			=	8;
-parameter	ARRAY_SIZE			=	6;
-
-parameter	ADDR_WIDTH			=	6;
-parameter	ROM_DEPTH			=	64;
+`include "../conv_layer_param.v"
 
 parameter	STAGE_INIT			=	3'd0;
 parameter	STAGE_PRELOAD		=	3'd1;	
@@ -100,8 +94,8 @@ reg		[1:0]				preload_cycle;
 output	[1:0]				ack; 
 reg		[1:0]				ack; 
 
-// 	data cache bank 0
-reg		[WIDTH-1:0]		cache_array_0_0;	
+/* // 	data cache bank 0
+reg		[`DATA_WIDTH-1:0]		cache_array_0_0;	
 reg		[WIDTH-1:0]		cache_array_0_1;	
 reg		[WIDTH-1:0]		cache_array_0_2;	
 reg		[WIDTH-1:0]		cache_array_0_3;	
@@ -128,7 +122,7 @@ reg		[WIDTH-1:0]		cache_array_2_3;
 reg		[WIDTH-1:0]		cache_array_2_4;	
 reg		[WIDTH-1:0]		cache_array_2_5;	
 reg		[WIDTH-1:0]		cache_array_2_6;
-reg		[WIDTH-1:0]		cache_array_2_7;
+reg		[WIDTH-1:0]		cache_array_2_7; */
 
 
 always @(posedge clk, negedge rst_n) begin
@@ -299,13 +293,13 @@ end
 //	rom_addr		
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
-		rom_addr		<=	6'b0;
+		rom_addr		<=	8'b0;
 	end
 	else begin
 		case (current_state)
 			
 			STAGE_INIT: begin
-				rom_addr	<=	6'b0;
+				rom_addr	<=	8'b0;
 			end
 			
 			STAGE_PRELOAD: begin

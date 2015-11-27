@@ -4,7 +4,7 @@
 program type_cast;
 
 parameter	WIDTH	=	32;
-parameter	DEPTH	=	64;
+parameter	DEPTH	=	256;
 
 bit		[WIDTH-1:0]		float32_list[DEPTH];
 shortreal				real_list[DEPTH];

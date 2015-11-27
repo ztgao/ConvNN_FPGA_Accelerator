@@ -4,6 +4,8 @@
 // so we can calculate 12 convolution in this step.
 // The conv_kernel is 3x3.
 
+
+`include "../../global_define.v"
 module conv_layer_top(
 	
 	//--input
@@ -41,7 +43,7 @@ input							enable;
 
 output	[ARRAY_SIZE*WIDTH-1:0]	feature;
 output	[ARRAY_SIZE*WIDTH-1:0]	o_pixel_bus;
-output	[5:0]					rom_addr;
+output	[7:0]					rom_addr;
 
 //	register connected to covolution kernel
 

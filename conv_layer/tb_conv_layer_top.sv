@@ -9,7 +9,7 @@ logic 			rst_n;
 logic 			enable;
 
 logic 	[31:0]	pixel_in;
-logic	[5:0]	rom_addr;
+logic	[7:0]	rom_addr;
 logic	[2:0]	current_state;
 
 logic	[191:0] out_kernel_port;
@@ -64,7 +64,12 @@ conv_layer_top U_conv_layer_top_0(
 	
 );
 
-rom_64x32 U_rom_1 (
+// rom_64x32 U_rom_1 (
+	// .a(rom_addr),      // input wire [5 : 0] a
+	// .spo(pixel_in)  // output wire [31 : 0] spo
+// );
+
+rom_256x32 U_rom_1 (
 	.a(rom_addr),      // input wire [5 : 0] a
 	.spo(pixel_in)  // output wire [31 : 0] spo
 );	
