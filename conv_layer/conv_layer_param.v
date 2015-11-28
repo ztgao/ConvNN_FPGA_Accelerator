@@ -8,7 +8,7 @@ parameter	STRDIE				=	1;
 
 parameter	ARRAY_SIZE			=	INPUT_SIZE - KERNEL_SIZE + 1;
 //parameter	BUFFER_BANK
-
+parameter	SHIFT_CYCLE			=	2'd3;
 
 // parameter	INIT				=	3'd0;
 // parameter	PRELOAD				=	3'd1;	
@@ -36,11 +36,16 @@ parameter	CMD_LOAD_START		=	2'd3;
 parameter	TOTAL_WEIGHT		=	4;
 //parameter	TOTAL_		=	ARRAY_SIZE;
 
-parameter	STAGE_INIT			=	3'd0;
-parameter	STAGE_PRELOAD		=	3'd1;	
-parameter	STAGE_SHIFT			=	3'd2;
-parameter	STAGE_LOAD			=	3'd3;
+// parameter	STAGE_INIT			=	3'd0;
+// parameter	STAGE_PRELOAD		=	3'd1;	
+// parameter	STAGE_SHIFT			=	3'd2;
+// parameter	STAGE_LOAD			=	3'd3;
 //parameter	STAGE_IDLE			=	3'd7;
 
 //	--	Buffer Parammeters
-parameter	BUFFER_LOAD_COUNT_END	=	3'd7;	//	INPUT_SIZE	= 8
+
+parameter	BUFFER_CMD_IDLE		=	2'd0;
+parameter	BUFFER_CMD_LOAD		=	2'd1;
+parameter	BUFFER_CMD_READ		=	2'd2;
+
+parameter	BUFFER_ACK_LOAD_FIN	=	1'd1;
