@@ -75,9 +75,9 @@ input	[1:0]			cmd;
 
 
 output	[ARRAY_SIZE*WIDTH-1:0]	out_kernel_port;
-reg		[IMAGE_SIZE*WIDTH-1:0]	out_kernel_port_reg;
+reg		[IMAGE_SIZE*WIDTH-1:0]	data_out_reg;
 
-assign	out_kernel_port		=	out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:(IMAGE_SIZE-ARRAY_SIZE)*WIDTH];
+assign	out_kernel_port		=	data_out_reg[IMAGE_SIZE*WIDTH-1:(IMAGE_SIZE-ARRAY_SIZE)*WIDTH];
 
 output	[ADDR_WIDTH-1:0] 	rom_addr;
 reg		[ADDR_WIDTH-1:0] 	rom_addr;
@@ -100,10 +100,10 @@ reg		[1:0]				preload_cycle;
 output	[1:0]				ack; 
 reg		[1:0]				ack; 
 
-// 	data cache bank
-reg		[IMAGE_SIZE*WIDTH-1:0]		cache_array_0;	
-reg		[IMAGE_SIZE*WIDTH-1:0]		cache_array_1;	
-reg		[IMAGE_SIZE*WIDTH-1:0]		cache_array_2;	
+wire	[IMAGE_SIZE*WIDTH-1:0]	data_from_cache;
+
+reg		[1:0]				cache_array_idx;
+
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -384,7 +384,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-
+/* 
 //	cache bank 0 behavior
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -557,71 +557,124 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-		
+*/		
 
 // output port behavior
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
-		out_kernel_port_reg <=	{8{32'h0}};
+		data_out_reg <=	{8{32'h0}};
 	end
 	else begin
 		case (current_state)
 			
 			STATE_INIT: begin
-				out_kernel_port_reg <=	{8{32'h0}};
+				data_out_reg <=	{8{32'h0}};
 			end
 			
 			STATE_PRELOAD: begin
-				out_kernel_port_reg <=	{8{32'h0}};
+				data_out_reg <=	{8{32'h0}};
 			end
 			
 			STATE_ROW_0: begin
 				if (shift_idx == 2'b00) begin
-					out_kernel_port_reg	<=	cache_array_0;
+					data_out_reg	<=	data_from_cache;
 																		
 				end
 				else begin
-					out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= out_kernel_port_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
+					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
 				end
 			end
 			
 			STATE_ROW_1: begin
 				if (shift_idx == 2'b00) begin
-					out_kernel_port_reg	<=	cache_array_1;							
+					data_out_reg	<=	data_from_cache;							
 				end
 				else begin
-					out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= out_kernel_port_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
+					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
 				end
 			end
 			
 			STATE_ROW_2: begin
 				if (shift_idx == 2'b00) begin
-					out_kernel_port_reg	<=	cache_array_2;							
+					data_out_reg	<=	data_from_cache;							
 				end
 				else begin
-					out_kernel_port_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= out_kernel_port_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
+					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
 				end
 			end	
 
 			STATE_BIAS: begin
-					out_kernel_port_reg	<=	{ 8 {FLOAT32_ONE}};
+					data_out_reg	<=	{ 8 {FLOAT32_ONE}};
 			end
 											
 			STATE_LOAD: begin
-					out_kernel_port_reg <=	{8{32'h0}};
+					data_out_reg <=	{8{32'h0}};
 			end									
 
 			STATE_IDLE: begin
-					out_kernel_port_reg <=	{8{32'h0}};
+					data_out_reg <=	{8{32'h0}};
 																						
 			end							
 		
 			default: begin
-				out_kernel_port_reg	<=	out_kernel_port_reg;				
+				data_out_reg	<=	data_out_reg;				
 			end
 		endcase
 	end
 end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		array_idx <=	2'd0;
+	else begin
+		case (current_state)
+			
+			STATE_INIT: 
+				array_idx <=	2'd0;
+						
+			STATE_PRELOAD: 
+				array_idx <=	2'd0;
+						
+			STATE_ROW_0: 
+				array_idx <=	2'd0;
+						
+			STATE_ROW_1: 
+				array_idx <=	2'd1;
+						
+			STATE_ROW_2: 
+				array_idx <=	2'd2;
+				
+			STATE_BIAS: 
+				array_idx <=	2'd0;
+														
+			STATE_LOAD: 
+				array_idx <=	2'd0;												
+
+			STATE_IDLE: 
+				array_idx <=	array_idx;
+				
+			default: 
+				array_idx <=	array_idx;				
+			
+		endcase
+	end
+end
+
+
+conv_layer_input_cache U_conv_layer_input_cache_0(
+// --input
+	.clk			(clk),
+	.rst_n			(rst_n),
+	.pixel_in		(pixel_in),
+	.read_index		(read_index),
+	.preload_cycle	(preload_cycle),
+	.current_state	(current_state),
+	.array_idx		(cache_array_idx),
+// --output
+	.data_out_bus	(data_from_cache)
+
+);
+
 
 endmodule
 
