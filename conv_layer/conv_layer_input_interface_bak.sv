@@ -1,25 +1,39 @@
-// version 	1.0 -- 	setup
-// version	1.1	--	add an extra cycle after "STAGE_ROW_2" for each output 
+// 	version 1.0 --	2015.11.01	
+//				-- 	setup
+//
+// 	version	1.1	--	2015.11.03
+//				--	add an extra cycle after "STAGE_ROW_2" for each output 
 //					port to fix on 1.0 to caculate the bias.
-// version	1.2 --  change the strategy of memory access and the data control
-//					will be finished by higher hierarchy
-
+// 
+// 	version	1.2 --	2015.11.04
+//				--  change the strategy of memory access and the data control
+//					will be finished by upper hierarchy.
+//
+// 	version	1.3	--	2015.11.10
+//				--	the state transfer process is not decided by the interface itself
+//					it will interact with the upper hierarchy by command and ack signal.
+//
 // Description:
 // A data cache for pixel floating point data between DDR3 and conv kernel, 
 // functioning by a standard FSM
+// The state transfer:
+//	
+//	|-- INIT --|-- PRELOAD --|-- SHIFT 0 1 2... --|-- BIAS --|-- LOAD --|
+//
+
 module conv_layer_input_interface(	
 // --input
 	clk,
 	rst_n,
 	enable,
 	pixel_in,
-//	cmd,
+	cmd,
+	ack,
 	
 // --output
-	rom_addr,
-	out_kernel_port,
 	current_state,
-	weight_set_counter
+	rom_addr,
+	out_kernel_port
 );
 
 parameter	WIDTH				=	32;
@@ -37,9 +51,19 @@ parameter	STAGE_ROW_1			=	3'd3;
 parameter	STAGE_ROW_2			=	3'd4;
 parameter	STAGE_BIAS			=	3'd5;
 parameter	STAGE_LOAD			=	3'd6;
-parameter	STAGE_END			=	3'd7;
+parameter	STAGE_IDLE			=	3'd7;
 
-parameter	WEIGHT_SET			=	4;
+parameter	ACK_IDLE			=	2'd0;
+parameter	ACK_PRELOAD_FIN		=	2'd1;
+parameter	ACK_SHIFT_FIN		=	2'd2;
+parameter	ACK_LOAD_FIN		=	2'd3;
+
+parameter	CMD_IDLE			=	2'd0;
+parameter	CMD_PRELOAD_START	=	2'd1;
+parameter	CMD_SHIFT_START		=	2'd2;
+parameter	CMD_LOAD_START		=	2'd3;
+
+parameter	FLOAT32_ONE			=	32'h3F800000;
 
 
 input					clk;
@@ -47,6 +71,7 @@ input					rst_n;
 input					enable;
 
 input	[WIDTH-1:0]		pixel_in;
+input	[1:0]			cmd;
 
 
 output	[ARRAY_SIZE*WIDTH-1:0]	out_kernel_port;
@@ -69,8 +94,11 @@ reg		[1:0]				shift_idx;
 
 reg		[1:0]				preload_cycle;
 
-output	[2:0]				weight_set_counter;
-reg		[2:0]				weight_set_counter;
+// output	[2:0]				weight_set_counter;
+// reg		[2:0]				weight_set_counter;
+
+output	[1:0]				ack; 
+reg		[1:0]				ack; 
 
 // 	data cache bank 0
 reg		[WIDTH-1:0]		cache_array_0_0;	
@@ -115,28 +143,33 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-// always @(idle) begin
-	// if(idle) begin
-		// last_state	=	current_state;
-	// end
-// end
+always @(next_state) begin
+	if(next_state == STAGE_IDLE) begin
+		last_state	=	current_state;
+	end
+end
 
 
-always @(current_state, read_index, shift_idx, preload_cycle) begin
+always @(current_state, read_index, shift_idx, preload_cycle,cmd) begin
 		case (current_state)	
 			
 			STAGE_INIT: begin 
-//				if ( cmd == PRELOAD )
+				if ( cmd == CMD_PRELOAD_START )
 					next_state	=	STAGE_PRELOAD;
-//				else
-//					next_state	=	STAGE_INIT;
+				else
+					next_state	=	STAGE_INIT;
 			end
 			
 			STAGE_PRELOAD: begin
-				if ( preload_cycle == 2'b11)
+				if ( cmd == CMD_SHIFT_START ) begin
 					next_state	=	STAGE_ROW_0;
-				else
-					next_state	=	STAGE_PRELOAD;
+				end
+				else begin
+					if ( preload_cycle < 2'b11)
+						next_state	=	STAGE_PRELOAD;
+					else
+						next_state	=	STAGE_IDLE;
+				end
 			end
 			
 			STAGE_ROW_0: begin
@@ -161,25 +194,33 @@ always @(current_state, read_index, shift_idx, preload_cycle) begin
 			end
 			
 			STAGE_BIAS: begin
-				if ( weight_set_counter == WEIGHT_SET )
+				if ( cmd == CMD_LOAD_START )
 					next_state 	= 	STAGE_LOAD;
-				else
+				else if (cmd == CMD_SHIFT_START )
 					next_state 	=	STAGE_ROW_0;
+				else
+					next_state	=	STAGE_IDLE;
 			end
 			
 			STAGE_LOAD: begin
-				if (read_index == 5'd7 )
-					next_state	=	STAGE_ROW_0;
+				if ( read_index == 5'd7 )
+					next_state	=	STAGE_IDLE;
+				else if ( cmd == CMD_SHIFT_START )
+					next_state	=	STAGE_ROW_0;				 
 				else
 					next_state	=	STAGE_LOAD;
 			end
-			
-			// STAGE_IDLE: begin
-				// if ()
-					// next_state	=	last_state;
-				// else
-					// next_state	=	STAGE_IDLE;
-			// end
+	//  Caution: whenever add a new state which could go into IDLE, should add the exit for this state.		
+			STAGE_IDLE: begin
+				if ( cmd == CMD_SHIFT_START)
+					next_state	=	STAGE_ROW_0;
+				else if ( cmd == CMD_LOAD_START )
+					next_state	=	STAGE_LOAD;
+				else if ( cmd == CMD_PRELOAD_START)
+					next_state	=	STAGE_PRELOAD;
+				else
+					next_state	=	STAGE_IDLE;
+			end
 			
 			default: begin
 				next_state	=	current_state;
@@ -197,28 +238,64 @@ always @(posedge clk, negedge rst_n) begin
 		else
 			preload_cycle	<=	preload_cycle;
 	end
+	else if (preload_cycle	==	2'b11)
+		preload_cycle	<=	2'b0;
 	else
-		preload_cycle <=	preload_cycle;
+		preload_cycle 	<=	preload_cycle;
 end
 
+//	-- ack
 always @(posedge clk, negedge rst_n) begin
-	if(!rst_n)
-		weight_set_counter	<=	3'b0;
-	else if (current_state == STAGE_ROW_2)
-		if(shift_idx == 2'b10)
-			weight_set_counter	<=	weight_set_counter + 1'b1;
-		else
-			weight_set_counter	<=	weight_set_counter;
-	else if (current_state == STAGE_BIAS)
-		if (weight_set_counter == WEIGHT_SET)
-			weight_set_counter	<=	3'b0;
-		else
-			weight_set_counter	<=	weight_set_counter;
-	else
-		weight_set_counter	<=	weight_set_counter;	
-end
+	if(!rst_n) begin
+		ack		<=	ACK_IDLE;
+	end
+	else begin
+		case (current_state)
 			
+			STAGE_INIT: begin
+				ack	<=	ACK_IDLE;
+			end
+			
+			STAGE_PRELOAD: begin
+				if ( preload_cycle == 2'b11)
+					ack	<=	ACK_PRELOAD_FIN;
+				else
+					ack	<=	ACK_IDLE;
+			end
+			
+			STAGE_ROW_0: begin
+				ack		<=	ACK_IDLE;
+			end
+			
+			STAGE_ROW_1: begin
+				ack		<=	ACK_IDLE;
+			end
+			
+			STAGE_ROW_2: begin
+				ack		<=	ACK_IDLE;
+			end	
 
+			STAGE_BIAS: begin
+				ack		<=	ACK_SHIFT_FIN;
+			end
+			
+			STAGE_LOAD: begin
+				if (read_index == 5'd7 )			
+					ack		<=	ACK_LOAD_FIN;
+				else
+					ack		<=	ACK_IDLE;
+			end
+			
+			STAGE_IDLE: 
+				ack		<=	ACK_IDLE;
+				
+			default: begin
+				ack		<=	ACK_IDLE;
+			end
+		endcase
+	end
+end	
+		
 //	rom_addr		
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
@@ -258,9 +335,13 @@ always @(posedge clk, negedge rst_n) begin
 				rom_addr	<=	rom_addr + 1'b1;
 			end
 				
+			STAGE_IDLE: begin
+				rom_addr	<=	rom_addr;
+			end	
+				
 			default: begin
 				rom_addr	<=	rom_addr;
-			end
+			end			
 		endcase
 	end
 end		
@@ -306,6 +387,10 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					read_index	<=	read_index + 1'b1;
 			end
+			
+			STAGE_IDLE: begin
+				read_index	<=	read_index;
+			end			
 			
 			default: begin
 				read_index	<=	read_index;
@@ -358,6 +443,10 @@ always @(posedge clk, negedge rst_n) begin
 			STAGE_LOAD: begin
 				shift_idx	<=	shift_idx;
 			end
+			
+			STAGE_IDLE: begin
+				shift_idx	<=	shift_idx;
+			end			
 		
 			default:
 				shift_idx	<=	shift_idx;
@@ -482,6 +571,17 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_0_6 <=	cache_array_0_6;
 					cache_array_0_7 <=	cache_array_0_7;
 				end
+			end
+
+			STAGE_IDLE: begin
+				cache_array_0_0	<=	cache_array_0_0;
+				cache_array_0_1 <=	cache_array_0_1;
+				cache_array_0_2 <=	cache_array_0_2;
+				cache_array_0_3 <=	cache_array_0_3;
+				cache_array_0_4 <=	cache_array_0_4;
+				cache_array_0_5 <=	cache_array_0_5;
+				cache_array_0_6 <=	cache_array_0_6;
+				cache_array_0_7 <=	cache_array_0_7;
 			end			
 						
 			default: begin
@@ -615,6 +715,17 @@ always @(posedge clk, negedge rst_n) begin
 					cache_array_1_6 <=	cache_array_1_6;
 					cache_array_1_7 <=	cache_array_1_7;
 				end
+			end
+
+			STAGE_IDLE: begin
+				cache_array_1_0	<=	cache_array_1_0;
+				cache_array_1_1 <=	cache_array_1_1;
+				cache_array_1_2 <=	cache_array_1_2;
+				cache_array_1_3 <=	cache_array_1_3;
+				cache_array_1_4 <=	cache_array_1_4;
+				cache_array_1_5 <=	cache_array_1_5;
+				cache_array_1_6 <=	cache_array_1_6;
+				cache_array_1_7 <=	cache_array_1_7;
 			end			
 		
 			default: begin
@@ -745,6 +856,17 @@ always @(posedge clk, negedge rst_n) begin
 							cache_array_2_7 <=	cache_array_2_7;
 					end
 				endcase
+			end
+
+			STAGE_IDLE: begin
+				cache_array_2_0	<=	cache_array_2_0;
+				cache_array_2_1 <=	cache_array_2_1;
+				cache_array_2_2 <=	cache_array_2_2;
+				cache_array_2_3 <=	cache_array_2_3;
+				cache_array_2_4 <=	cache_array_2_4;
+				cache_array_2_5 <=	cache_array_2_5;
+				cache_array_2_6 <=	cache_array_2_6;
+				cache_array_2_7 <=	cache_array_2_7;
 			end			
 		
 			default: begin
@@ -831,14 +953,14 @@ always @(posedge clk, negedge rst_n) begin
 			end	
 
 			STAGE_BIAS: begin
-					out_kernel_port_reg	<=	{ 	32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1,
-												32'b1									  
+					out_kernel_port_reg	<=	{ 	FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE,
+												FLOAT32_ONE									  
 											};
 			end
 											
@@ -851,8 +973,20 @@ always @(posedge clk, negedge rst_n) begin
 												32'b0,
 												32'b0,
 												32'b0
-											};																						
-											
+											};
+			end									
+
+			STAGE_IDLE: begin
+					out_kernel_port_reg	<=	{	32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0,
+												32'b0
+											};
+																						
 			end							
 		
 			default: begin
@@ -863,3 +997,4 @@ always @(posedge clk, negedge rst_n) begin
 end
 
 endmodule
+
