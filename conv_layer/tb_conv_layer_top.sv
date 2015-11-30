@@ -1,6 +1,7 @@
 // version 1.0 -- setup
 // Description:
 
+`include "../../global_define.v"
 `timescale 1ns/1ns
 module tb_conv_layer_top;
 
@@ -9,8 +10,8 @@ logic 			rst_n;
 logic 			enable;
 
 logic 	[31:0]	pixel_in;
-logic	[5:0]	rom_addr;
-logic	[2:0]	current_state;
+logic	[`EXT_ADDR_WIDTH-1:0]	rom_addr;
+
 
 logic	[191:0] out_kernel_port;
 logic	[31:0]	out_kernel_port_0_0;
@@ -55,7 +56,7 @@ conv_layer_top U_conv_layer_top_0(
 	.clk 			(clk),
 	.rst_n			(rst_n),
 	.enable			(enable),
-	.pixel_in		(pixel_in),
+	.data_in		(pixel_in),
 //	.idle			(idle),
 	
 // --output
@@ -64,7 +65,12 @@ conv_layer_top U_conv_layer_top_0(
 	
 );
 
-rom_64x32 U_rom_1 (
+// rom_64x32 U_rom_1 (
+	// .a(rom_addr),      // input wire [5 : 0] a
+	// .spo(pixel_in)  // output wire [31 : 0] spo
+// );
+
+rom_256x32 U_rom_1 (
 	.a(rom_addr),      // input wire [5 : 0] a
 	.spo(pixel_in)  // output wire [31 : 0] spo
 );	

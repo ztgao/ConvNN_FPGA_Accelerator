@@ -3,7 +3,7 @@
 // Consider that the weight set will not change in a specific network, so I try to put them in
 // a ROM IP by Xilinx. In the test, the ROM is configured as a 32x4B rom and I will put two set
 // weight.
-
+`include "../../global_define.v"
 module conv_weight_cache(
 	//--input
 	clk,
@@ -15,7 +15,6 @@ module conv_weight_cache(
 	
 );
 
-parameter	WIDTH				=	32;
 parameter	KERNEL_SIZE			=	3;	//3x3
 parameter	IMAGE_SIZE			=	8;
 parameter	ARRAY_SIZE			=	6;
@@ -40,13 +39,13 @@ input					clk;
 input					rst_n;
 input	[2:0]			current_state;
 
-output	[WIDTH-1:0]		o_weight;
-reg		[WIDTH-1:0]		o_weight;
+output	[`DATA_WIDTH-1:0]		o_weight;
+reg		[`DATA_WIDTH-1:0]		o_weight;
 
 reg		[5:0]			rom_addr;	
 
 
-wire	[WIDTH-1:0]		r_data;
+wire	[`DATA_WIDTH-1:0]		r_data;
 
 
 always @(posedge clk, negedge rst_n) begin

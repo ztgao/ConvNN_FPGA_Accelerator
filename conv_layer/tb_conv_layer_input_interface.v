@@ -1,6 +1,7 @@
 // version 1.0 -- setup
 // Description:
 
+`include "../../global_define.v"
 `timescale 1ns/1ns
 module tb_conv_layer_input_interface;
 

@@ -1,4 +1,6 @@
 // version 1.0 -- setup
+
+`include "../../global_define.v"
 module conv_kernel(
 	clk,
 	rst_n,
@@ -8,27 +10,25 @@ module conv_kernel(
 	o_pixel
 );
 
-parameter	WIDTH	=	32;
-
 
 input					clk;
 input					rst_n;
 input					clear;
-input	[WIDTH-1:0]		i_pixel;
-input	[WIDTH-1:0]		i_weight;
+input	[`DATA_WIDTH-1:0]		i_pixel;
+input	[`DATA_WIDTH-1:0]		i_weight;
 
-output	[WIDTH-1:0]		o_pixel;
+output	[`DATA_WIDTH-1:0]		o_pixel;
 
-reg		[WIDTH-1:0]		o_pixel;
-//reg		[WIDTH-1:0]		o_pixel_reg;
+reg		[`DATA_WIDTH-1:0]		o_pixel;
+//reg		[`DATA_WIDTH-1:0]		o_pixel_reg;
 
-reg		[WIDTH-1:0]		mult_a;
-reg		[WIDTH-1:0]		mult_b;
-wire	[WIDTH-1:0]		product;
+reg		[`DATA_WIDTH-1:0]		mult_a;
+reg		[`DATA_WIDTH-1:0]		mult_b;
+wire	[`DATA_WIDTH-1:0]		product;
 
-reg		[WIDTH-1:0]		add_a;
-reg		[WIDTH-1:0]		add_b;
-wire	[WIDTH-1:0]		sum;
+reg		[`DATA_WIDTH-1:0]		add_a;
+reg		[`DATA_WIDTH-1:0]		add_b;
+wire	[`DATA_WIDTH-1:0]		sum;
 
 always @(posedge clk, negedge rst_n)	begin
 	if(!rst_n) begin

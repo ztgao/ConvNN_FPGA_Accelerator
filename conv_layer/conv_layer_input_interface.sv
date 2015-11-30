@@ -13,20 +13,21 @@
 //				--	the state transfer process is not decided by the interface itself
 //					it will interact with the upper hierarchy by command and ack signal.
 //
-// Description:
-// A data cache for pixel floating point data between DDR3 and conv kernel, 
-// functioning by a standard FSM
-// The state transfer:
+// 	Description:
+// 	A data cache for pixel floating point data between DDR3 and conv kernel, 
+// 	functioning by a standard FSM
+// 	The state transfer:
 //	
 //	|-- INIT --|-- PRELOAD --|-- SHIFT 0 1 2... --|-- BIAS --|-- LOAD --|
 //
 
+`include "../../global_define.v"
 module conv_layer_input_interface(	
 // --input
 	clk,
 	rst_n,
 	enable,
-	pixel_in,
+	data_in,
 	cmd,
 	ack,
 	
@@ -36,19 +37,15 @@ module conv_layer_input_interface(
 	out_kernel_port
 );
 
-parameter	WIDTH				=	32;
 parameter	KERNEL_SIZE			=	3;	//3x3
 parameter	IMAGE_SIZE			=	8;
 parameter	ARRAY_SIZE			=	6;
 
-parameter	ADDR_WIDTH			=	6;
-parameter	ROM_DEPTH			=	64;
+parameter	ROM_DEPTH			=	256;
 
 parameter	STATE_INIT			=	3'd0;
 parameter	STATE_PRELOAD		=	3'd1;	
-parameter	STATE_ROW_0			=	3'd2;
-parameter	STATE_ROW_1			=	3'd3;
-parameter	STATE_ROW_2			=	3'd4;
+parameter	STATE_SHIFT			=	3'd2;
 parameter	STATE_BIAS			=	3'd5;
 parameter	STATE_LOAD			=	3'd6;
 parameter	STATE_IDLE			=	3'd7;
@@ -59,9 +56,9 @@ parameter	ACK_SHIFT_FIN		=	2'd2;
 parameter	ACK_LOAD_FIN		=	2'd3;
 
 parameter	CMD_IDLE			=	2'd0;
-parameter	CMD_PRELOAD_START	=	2'd1;
-parameter	CMD_SHIFT_START		=	2'd2;
-parameter	CMD_LOAD_START		=	2'd3;
+parameter	CMD_PRELOAD			=	2'd1;
+parameter	CMD_SHIFT			=	2'd2;
+parameter	CMD_LOAD			=	2'd3;
 
 parameter	FLOAT32_ONE			=	32'h3F800000;
 
@@ -70,17 +67,17 @@ input					clk;
 input					rst_n;
 input					enable;
 
-input	[WIDTH-1:0]		pixel_in;
+input	[`DATA_WIDTH-1:0]		data_in;
 input	[1:0]			cmd;
 
 
-output	[ARRAY_SIZE*WIDTH-1:0]	out_kernel_port;
-reg		[IMAGE_SIZE*WIDTH-1:0]	data_out_reg;
+output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	out_kernel_port;
+reg		[IMAGE_SIZE*`DATA_WIDTH-1:0]	data_out_reg;
 
-assign	out_kernel_port		=	data_out_reg[IMAGE_SIZE*WIDTH-1:(IMAGE_SIZE-ARRAY_SIZE)*WIDTH];
+assign	out_kernel_port		=	data_out_reg[IMAGE_SIZE*`DATA_WIDTH-1:(IMAGE_SIZE-ARRAY_SIZE)*`DATA_WIDTH];
 
-output	[ADDR_WIDTH-1:0] 	rom_addr;
-reg		[ADDR_WIDTH-1:0] 	rom_addr;
+output	[`EXT_ADDR_WIDTH-1:0] 	rom_addr;
+reg		[`EXT_ADDR_WIDTH-1:0] 	rom_addr;
 
 output	[2:0]				current_state;
 reg		[2:0]				current_state;
@@ -91,16 +88,15 @@ reg		[2:0]				last_state;
 
 reg		[4:0]				read_index;
 reg		[1:0]				shift_idx;
+reg		[1:0]				row_idx;
 
 reg		[1:0]				preload_cycle;
 
-// output	[2:0]				weight_set_counter;
-// reg		[2:0]				weight_set_counter;
 
 output	[1:0]				ack; 
 reg		[1:0]				ack; 
 
-wire	[IMAGE_SIZE*WIDTH-1:0]	data_from_cache;
+wire	[IMAGE_SIZE*`DATA_WIDTH-1:0]	data_from_cache;
 
 reg		[1:0]				cache_array_idx;
 
@@ -116,25 +112,19 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-// always @(next_state) begin
-	// if(next_state == STATE_IDLE) 
-		// last_state	=	current_state;
-// end
-
-
 always @(current_state, read_index, shift_idx, preload_cycle,cmd) begin
 		case (current_state)	
 			
 			STATE_INIT: begin 
-				if ( cmd == CMD_PRELOAD_START )
+				if ( cmd == CMD_PRELOAD )
 					next_state	=	STATE_PRELOAD;
 				else
 					next_state	=	STATE_INIT;
 			end
 			
 			STATE_PRELOAD: begin
-				if ( cmd == CMD_SHIFT_START ) 
-					next_state	=	STATE_ROW_0;
+				if ( cmd == CMD_SHIFT ) 
+					next_state	=	STATE_SHIFT;
 				else begin
 					if ( preload_cycle < 2'b11)
 						next_state	=	STATE_PRELOAD;
@@ -143,47 +133,35 @@ always @(current_state, read_index, shift_idx, preload_cycle,cmd) begin
 				end
 			end
 			
-			STATE_ROW_0: 
-				if (shift_idx	== 	2'b10)
-					next_state	=	STATE_ROW_1;
-				else
-					next_state	=	STATE_ROW_0;
-						
-			STATE_ROW_1: 
-				if (shift_idx	== 	2'b10)
-					next_state	=	STATE_ROW_2;
-				else
-					next_state	=	STATE_ROW_1;							
-		
-			STATE_ROW_2: 
-				if (shift_idx	== 	2'b10)
+			STATE_SHIFT: 
+				if (shift_idx	== 	2'b10 && row_idx == 2'b10)
 					next_state	=	STATE_BIAS;
 				else
-					next_state	=	STATE_ROW_2;				
+					next_state	=	STATE_SHIFT;			
 			
 			STATE_BIAS: 
-				if ( cmd == CMD_LOAD_START )
+				if ( cmd == CMD_LOAD )
 					next_state 	= 	STATE_LOAD;
-				else if (cmd == CMD_SHIFT_START )
-					next_state 	=	STATE_ROW_0;
+				else if (cmd == CMD_SHIFT )
+					next_state 	=	STATE_SHIFT;
 				else
 					next_state	=	STATE_IDLE;
 				
 			STATE_LOAD: 
 				if ( read_index == 5'd7 )
 					next_state	=	STATE_IDLE;
-				else if ( cmd == CMD_SHIFT_START )
-					next_state	=	STATE_ROW_0;				 
+				else if ( cmd == CMD_SHIFT )
+					next_state	=	STATE_SHIFT;				 
 				else
 					next_state	=	STATE_LOAD;
 					
 	//  Caution: whenever add a new state which could go into IDLE, should add the exit for this state.		
 			STATE_IDLE: 
-				if ( cmd == CMD_SHIFT_START)
-					next_state	=	STATE_ROW_0;
-				else if ( cmd == CMD_LOAD_START )
+				if ( cmd == CMD_SHIFT)
+					next_state	=	STATE_SHIFT;
+				else if ( cmd == CMD_LOAD )
 					next_state	=	STATE_LOAD;
-				else if ( cmd == CMD_PRELOAD_START)
+				else if ( cmd == CMD_PRELOAD)
 					next_state	=	STATE_PRELOAD;
 				else
 					next_state	=	STATE_IDLE;
@@ -226,15 +204,9 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					ack	<=	ACK_IDLE;
 						
-			STATE_ROW_0: 
+			STATE_SHIFT: 
 				ack		<=	ACK_IDLE;			
 			
-			STATE_ROW_1: 
-				ack		<=	ACK_IDLE;			
-			
-			STATE_ROW_2: 
-				ack		<=	ACK_IDLE;	
-
 			STATE_BIAS: 
 				ack		<=	ACK_SHIFT_FIN;
 			
@@ -270,15 +242,9 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					rom_addr	<=	rom_addr;
 			
-			STATE_ROW_0: 
+			STATE_SHIFT: 
 				rom_addr	<=	rom_addr;
 			
-			STATE_ROW_1: 
-				rom_addr	<=	rom_addr;
-			
-			STATE_ROW_2: 
-				rom_addr	<=	rom_addr;	
-
 			STATE_BIAS: 
 				rom_addr	<=	rom_addr;
 			
@@ -311,15 +277,9 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					read_index	<=	read_index + 1'b1;
 			
-			STATE_ROW_0: 
+			STATE_SHIFT: 
 				read_index	<=	read_index;					
-			
-			STATE_ROW_1: 
-				read_index	<=	read_index;
-			
-			STATE_ROW_2: 
-				read_index	<=	read_index;
-			
+						
 			STATE_BIAS: 
 				read_index	<=	read_index;
 			
@@ -351,24 +311,12 @@ always @(posedge clk, negedge rst_n) begin
 			STATE_PRELOAD: 
 				shift_idx	<=	2'b0;
 			
-			STATE_ROW_0: 
+			STATE_SHIFT: 
 				if (shift_idx == 2'b10)
 					shift_idx	<=	2'b0;
 				else
 					shift_idx	<=	shift_idx + 2'b1;
 			
-			STATE_ROW_1: 
-				if (shift_idx == 2'b10)
-					shift_idx	<=	2'b0;
-				else
-					shift_idx	<=	shift_idx + 2'b1;
-			
-			STATE_ROW_2: 
-				if (shift_idx == 2'b10)
-					shift_idx	<=	2'b0;
-				else
-					shift_idx	<=	shift_idx + 2'b1;
-
 			STATE_BIAS: 
 				shift_idx	<=	shift_idx;
 
@@ -383,289 +331,115 @@ always @(posedge clk, negedge rst_n) begin
 		endcase
 	end
 end
-
-/* 
-//	cache bank 0 behavior
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) 
-		cache_array_0	<=	{8{32'h0}};
-	else begin
-		case (current_state)
-			
-			STATE_INIT: 
-				cache_array_0	<=	{8{32'h0}};			
-			
-			
-			STATE_PRELOAD: 
-				if (preload_cycle < 2'd3) begin				
-					if (read_index == 5'd8) 
-						cache_array_0	<=	cache_array_1;
-					else 
-						cache_array_0	<=	cache_array_0;
-				end
-			
-			
-			STATE_ROW_0: 
-				cache_array_0	<=	cache_array_0;		
-			
-			
-			STATE_ROW_1: 
-				cache_array_0	<=	cache_array_0;				
-			
-			
-			STATE_ROW_2: 
-				cache_array_0	<=	cache_array_0;	
-			
-			
-			STATE_BIAS: 
-				cache_array_0	<=	cache_array_0;
-			
-
-			STATE_LOAD: 
-				if (read_index == 5'b0) 
-					cache_array_0	<=	cache_array_1;				
-				else 
-					cache_array_0	<=	cache_array_0;
-			
-			STATE_IDLE: 
-				cache_array_0	<=	cache_array_0;			
-						
-			default: 
-				cache_array_0	<=	cache_array_0;
-		endcase
-	end
-end		
-
-//	cache bank 1 behavior
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		cache_array_1	<=	{8{32'h0}};
-	end
-	else begin
-		case (current_state)
-			
-			STATE_INIT: begin
-				cache_array_1	<=	{8{32'h0}};			
-			end	
-
-			STATE_PRELOAD: begin
-				if (preload_cycle < 2'd3) begin			
-					if (read_index == 5'd8) begin			
-						cache_array_1	<=	cache_array_2;
-					end
-					else begin
-						cache_array_1	<=	cache_array_1;
-					end
-				end
-			end			
-			
-			STATE_ROW_0: begin
-				cache_array_1	<=	cache_array_1;		
-			end				
-						
-			STATE_ROW_1: begin
-				cache_array_1	<=	cache_array_1;	
-			end
-			
-			STATE_ROW_2: begin
-				cache_array_1	<=	cache_array_1;	
-			end
-
-			STATE_BIAS: begin
-				cache_array_1	<=	cache_array_1;	
-			end
-
-			STATE_LOAD: begin
-				if (read_index == 5'b0) begin			
-					cache_array_1	<=	cache_array_2;
-				end
-				else begin
-					cache_array_1	<=	cache_array_1;
-				end
-			end
-
-			STATE_IDLE: begin
-				cache_array_1	<=	cache_array_1;
-			end			
 		
-			default: begin
-				cache_array_1	<=	cache_array_1;
-			end
-		endcase
-	end
-end	
-
-//	cache bank 2 behavior
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) 
-		cache_array_2	<=	{8{32'h0}};
-	else begin
-		case (current_state)
-			
-			STATE_INIT: 
-				cache_array_2	<=	{8{32'h0}};			
-			
-
-			STATE_PRELOAD: 
-				case (read_index)
-					5'd0: 	cache_array_2[8*WIDTH-1:7*WIDTH]	<=	pixel_in;
-					5'd1: 	cache_array_2[7*WIDTH-1:6*WIDTH]	<=	pixel_in;
-					5'd2: 	cache_array_2[6*WIDTH-1:5*WIDTH]	<=	pixel_in;
-					5'd3: 	cache_array_2[5*WIDTH-1:4*WIDTH]	<=	pixel_in;
-					5'd4: 	cache_array_2[4*WIDTH-1:3*WIDTH]	<=	pixel_in;
-					5'd5: 	cache_array_2[3*WIDTH-1:2*WIDTH]	<=	pixel_in;
-					5'd6: 	cache_array_2[2*WIDTH-1:1*WIDTH]	<=	pixel_in;
-					5'd7: 	cache_array_2[1*WIDTH-1:0]			<=	pixel_in;
-					default:       
-						cache_array_2	<=	cache_array_2;					
-				endcase
-						
-			
-			STATE_ROW_0:   
-				cache_array_2	<=	cache_array_2;
-						
-			STATE_ROW_1:      
-				cache_array_2	<=	cache_array_2;		
-						
-			STATE_ROW_2: 
-				cache_array_2	<=	cache_array_2;		
-			
-			STATE_BIAS: 
-				cache_array_2	<=	cache_array_2;	
-			
-			STATE_LOAD: 
-				case (read_index)
-					5'd0: 	cache_array_2[8*WIDTH-1:7*WIDTH]	<=	pixel_in;
-					5'd1: 	cache_array_2[7*WIDTH-1:6*WIDTH]	<=	pixel_in;
-					5'd2: 	cache_array_2[6*WIDTH-1:5*WIDTH]	<=	pixel_in;
-					5'd3: 	cache_array_2[5*WIDTH-1:4*WIDTH]	<=	pixel_in;
-					5'd4: 	cache_array_2[4*WIDTH-1:3*WIDTH]	<=	pixel_in;
-					5'd5: 	cache_array_2[3*WIDTH-1:2*WIDTH]	<=	pixel_in;
-					5'd6: 	cache_array_2[2*WIDTH-1:1*WIDTH]	<=	pixel_in;
-					5'd7: 	cache_array_2[1*WIDTH-1:0]			<=	pixel_in;
-					default:       
-						cache_array_2	<=	cache_array_2;
-				endcase
-
-			STATE_IDLE: 
-				cache_array_2	<=	cache_array_2;			
-		
-			default: 
-				cache_array_2	<=	cache_array_2;
-	
-		endcase
-	end
-end
-
-*/		
 
 // output port behavior
 always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
+	if(!rst_n) 
 		data_out_reg <=	{8{32'h0}};
-	end
 	else begin
 		case (current_state)
 			
-			STATE_INIT: begin
+			STATE_INIT: 
 				data_out_reg <=	{8{32'h0}};
-			end
-			
-			STATE_PRELOAD: begin
+					
+			STATE_PRELOAD: 
 				data_out_reg <=	{8{32'h0}};
-			end
+				
+			STATE_SHIFT: 
+				if (shift_idx == 2'b00) 
+					data_out_reg	<=	data_from_cache;																		
+				else 
+					data_out_reg[IMAGE_SIZE*`DATA_WIDTH-1:`DATA_WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*`DATA_WIDTH-1:0];
 			
-			STATE_ROW_0: begin
-				if (shift_idx == 2'b00) begin
-					data_out_reg	<=	data_from_cache;
-																		
-				end
-				else begin
-					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
-				end
-			end
-			
-			STATE_ROW_1: begin
-				if (shift_idx == 2'b00) begin
-					data_out_reg	<=	data_from_cache;							
-				end
-				else begin
-					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
-				end
-			end
-			
-			STATE_ROW_2: begin
-				if (shift_idx == 2'b00) begin
-					data_out_reg	<=	data_from_cache;							
-				end
-				else begin
-					data_out_reg[IMAGE_SIZE*WIDTH-1:WIDTH] <= data_out_reg[(IMAGE_SIZE-1)*WIDTH-1:0];
-				end
-			end	
-
-			STATE_BIAS: begin
-					data_out_reg	<=	{ 8 {FLOAT32_ONE}};
-			end
-											
-			STATE_LOAD: begin
-					data_out_reg <=	{8{32'h0}};
-			end									
-
-			STATE_IDLE: begin
-					data_out_reg <=	{8{32'h0}};
-																						
-			end							
-		
-			default: begin
+			STATE_BIAS: 
+				data_out_reg	<=	{ 8 {FLOAT32_ONE}};
+														
+			STATE_LOAD: 
+				data_out_reg <=	{8{32'h0}};
+												
+			STATE_IDLE: 
+				data_out_reg <=	{8{32'h0}};
+																															
+			default: 
 				data_out_reg	<=	data_out_reg;				
-			end
 		endcase
 	end
 end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		array_idx <=	2'd0;
+		cache_array_idx <=	2'd0;
 	else begin
 		case (current_state)
 			
 			STATE_INIT: 
-				array_idx <=	2'd0;
+				cache_array_idx <=	2'd0;
 						
 			STATE_PRELOAD: 
-				array_idx <=	2'd0;
+				cache_array_idx <=	2'd0;
 						
-			STATE_ROW_0: 
-				array_idx <=	2'd0;
-						
-			STATE_ROW_1: 
-				array_idx <=	2'd1;
-						
-			STATE_ROW_2: 
-				array_idx <=	2'd2;
+			STATE_SHIFT: 
+				if( shift_idx == 2'd2 )
+					cache_array_idx	<=	cache_array_idx + 1'd1;	
+				else
+					cache_array_idx	<=	cache_array_idx;					
 				
 			STATE_BIAS: 
-				array_idx <=	2'd0;
+				cache_array_idx <=	2'd0;
 														
 			STATE_LOAD: 
-				array_idx <=	2'd0;												
+				cache_array_idx <=	2'd0;												
 
 			STATE_IDLE: 
-				array_idx <=	array_idx;
+				cache_array_idx <=	cache_array_idx;
 				
 			default: 
-				array_idx <=	array_idx;				
+				cache_array_idx <=	cache_array_idx;				
 			
 		endcase
 	end
 end
 
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		row_idx <=	2'd0;
+	else begin
+		case (current_state)
+			
+			STATE_INIT: 
+				row_idx <=	2'd0;
+						
+			STATE_PRELOAD: 
+				row_idx <=	2'd0;
+						
+			STATE_SHIFT: 			
+				if( shift_idx == 2'd2 )
+					row_idx	<=	row_idx + 1'd1;	
+				else
+					row_idx	<=	row_idx;
+									
+			STATE_BIAS: 
+				row_idx <=	2'd0;
+														
+			STATE_LOAD: 
+				row_idx <=	2'd0;												
+
+			STATE_IDLE: 
+				row_idx <=	row_idx;
+				
+			default: 
+				row_idx <=	row_idx;				
+			
+		endcase
+	end
+end
 
 conv_layer_input_cache U_conv_layer_input_cache_0(
 // --input
 	.clk			(clk),
 	.rst_n			(rst_n),
-	.pixel_in		(pixel_in),
+	.data_in		(data_in),
 	.read_index		(read_index),
 	.preload_cycle	(preload_cycle),
 	.current_state	(current_state),
@@ -674,6 +448,39 @@ conv_layer_input_cache U_conv_layer_input_cache_0(
 	.data_out_bus	(data_from_cache)
 
 );
+
+//	--	Observe the interface state
+always	@(current_state, preload_cycle) begin
+	case (current_state)
+			
+			STATE_INIT: begin
+				$display("[ %10t ]: Interface initializing.",$time);
+			end
+			
+			STATE_PRELOAD: begin
+				if(preload_cycle == 2'd0)
+					$display("[ %10t ]: Now the cache will drop all the previous data and refresh to new data.",$time);	
+				else
+					$display("[ %10t ]: Complete loading array [ %2d ].",$time, preload_cycle - 1);
+			end
+			
+			STATE_SHIFT: 
+				$display("[ %10t ]: Begin to load one data from one row of the cache and shift the convolution window.",$time);
+									
+			STATE_BIAS: 
+				$display("[ %10t ]: Add the bias value.",$time);
+														
+			STATE_LOAD: 
+				$display("[ %10t ]: Now the cache will load one row of new data from external mem.",$time);												
+
+			STATE_IDLE: 
+				$display("[ %10t ]: Cache Idle.",$time);
+				
+			default: 
+				$display("[ %10t ]: Cache Abnormal.",$time);				
+			
+	endcase
+end
 
 
 endmodule
