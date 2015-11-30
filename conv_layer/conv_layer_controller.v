@@ -53,15 +53,15 @@ output	[2:0]			current_state;
 reg		[2:0]			current_state;
 reg		[2:0]			next_state;
 
-parameter	STAGE_INIT			=	3'd0;
-parameter	STAGE_PRELOAD		=	3'd1;	
-parameter	STAGE_SHIFT			=	3'd2;
-parameter	STAGE_LOAD			=	3'd3;
-//parameter	STAGE_IDLE			=	3'd7;
+parameter	STATE_INIT			=	3'd0;
+parameter	STATE_PRELOAD		=	3'd1;	
+parameter	STATE_SHIFT			=	3'd2;
+parameter	STATE_LOAD			=	3'd3;
+//parameter	STATE_IDLE			=	3'd7;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		current_state	<=	STAGE_INIT;
+		current_state	<=	STATE_INIT;
 	else begin
 		if (enable)
 			current_state	<=	next_state;
@@ -72,35 +72,35 @@ end
 
 always @(current_state, input_interface_ack, weight_cycle) begin
 	case (current_state)
-		STAGE_INIT: 
-			next_state	=	STAGE_PRELOAD;
+		STATE_INIT: 
+			next_state	=	STATE_PRELOAD;
 		
-		STAGE_PRELOAD: 
+		STATE_PRELOAD: 
 			if ( input_interface_ack == ACK_PRELOAD_FIN )
-				next_state	=	STAGE_SHIFT;
+				next_state	=	STATE_SHIFT;
 			else
-				next_state	=	STAGE_PRELOAD;
+				next_state	=	STATE_PRELOAD;
 		
-		STAGE_SHIFT: begin
+		STATE_SHIFT: begin
 			if ( input_interface_ack == ACK_SHIFT_FIN ) begin
 				if ( weight_cycle == TOTAL_WEIGHT - 1  ) begin
 					if ( shift_cycle  == TOTAL_SHIFT - 1 )
-						next_state	<=	STAGE_PRELOAD;
+						next_state	<=	STATE_PRELOAD;
 					else
-						next_state	=	STAGE_LOAD;
+						next_state	=	STATE_LOAD;
 				end
 				else
-					next_state	=	STAGE_SHIFT;
+					next_state	=	STATE_SHIFT;
 			end
 			else
-				next_state	= STAGE_SHIFT;
+				next_state	= STATE_SHIFT;
 		end
 		
-		STAGE_LOAD: 
+		STATE_LOAD: 
 			if (input_interface_ack	==	ACK_LOAD_FIN)
-				next_state	=	STAGE_SHIFT;
+				next_state	=	STATE_SHIFT;
 			else
-				next_state	=	STAGE_LOAD;
+				next_state	=	STATE_LOAD;
 		
 		default:
 			next_state	= current_state;
@@ -112,16 +112,16 @@ always @(posedge clk, negedge rst_n) begin
 		input_interface_cmd	<=	CMD_IDLE;
 	else begin
 		case (current_state)
-			STAGE_INIT:
+			STATE_INIT:
 				input_interface_cmd <=	CMD_PRELOAD;
 				
-			STAGE_PRELOAD:
+			STATE_PRELOAD:
 				if ( input_interface_ack == ACK_PRELOAD_FIN )
 					input_interface_cmd	<=	CMD_SHIFT;
 				else
 					input_interface_cmd	<=	CMD_IDLE;
 					
-			STAGE_SHIFT:
+			STATE_SHIFT:
 				if ( input_interface_ack == ACK_SHIFT_FIN) begin
 					if ( weight_cycle == TOTAL_WEIGHT - 1 ) begin
 						if ( shift_cycle  == TOTAL_SHIFT - 1 )
@@ -135,7 +135,7 @@ always @(posedge clk, negedge rst_n) begin
 				else
 					input_interface_cmd	<= CMD_IDLE;
 			
-			STAGE_LOAD:
+			STATE_LOAD:
 				if ( input_interface_ack == ACK_LOAD_FIN)
 					input_interface_cmd	<=	CMD_SHIFT;
 				else
@@ -165,14 +165,12 @@ end
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
 		shift_cycle		<=	3'd0;
-	else if (input_interface_ack == ACK_SHIFT_FIN) begin
-		if ( weight_cycle == TOTAL_WEIGHT - 1)
-			shift_cycle		<=	shift_cycle	+ 1'b1;
-		else
-			shift_cycle		<=	shift_cycle;
-	end
+	else if (input_interface_ack == ACK_SHIFT_FIN && weight_cycle == TOTAL_WEIGHT - 1) 
+		shift_cycle		<=	shift_cycle	+ 1'b1;	
 	else if ( shift_cycle == TOTAL_SHIFT)
 		shift_cycle		<=	3'd0;
+	else
+		shift_cycle	<=	shift_cycle;
 end
 
 endmodule

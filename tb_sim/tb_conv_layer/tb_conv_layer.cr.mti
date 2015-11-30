@@ -1,0 +1,74 @@
+D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_kernel_array.v {1 {vlog -work work -vopt D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_kernel_array.v
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module conv_kernel_array
+
+Top level modules:
+	conv_kernel_array
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/tb_conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/tb_conv_layer_top.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module tb_conv_layer_top
+
+Top level modules:
+	tb_conv_layer_top
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/floating_adder_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/floating_adder_sim.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module floating_adder_sim
+
+Top level modules:
+	floating_adder_sim
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_64x32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_64x32_sim.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module rom_64x32_sim
+
+Top level modules:
+	rom_64x32_sim
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_top.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module conv_layer_top
+
+Top level modules:
+	conv_layer_top
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/floating_mult_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/floating_mult_sim.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module floating_mult_sim
+
+Top level modules:
+	floating_mult_sim
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_input_cache.v {1 {vlog -work work -vopt D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_input_cache.v
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module conv_layer_input_cache
+
+Top level modules:
+	conv_layer_input_cache
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_controller.v {1 {vlog -work work -vopt D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_layer_controller.v
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module conv_layer_controller
+
+Top level modules:
+	conv_layer_controller
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_kernel_param.v {1 {vlog -work work -vopt D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_kernel_param.v
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_weight_cache.v {1 {vlog -work work -vopt D:/Gzt/project/ConvNN_FPGA_Accelerator/conv_layer/conv_weight_cache.v
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module conv_weight_cache
+
+Top level modules:
+	conv_weight_cache
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_256x32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_256x32_sim.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module rom_256x32_sim
+
+Top level modules:
+	rom_256x32_sim
+
+} {} {}}

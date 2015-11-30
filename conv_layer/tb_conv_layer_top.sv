@@ -70,9 +70,18 @@ conv_layer_top U_conv_layer_top_0(
 	// .spo(pixel_in)  // output wire [31 : 0] spo
 // );
 
-rom_256x32 U_rom_1 (
-	.a(rom_addr),      // input wire [5 : 0] a
-	.spo(pixel_in)  // output wire [31 : 0] spo
-);	
 
+`ifdef	RTL_SIMULATION	
+	rom_256x32_sim U_rom_1 (
+		.addr(rom_addr),      // input wire [5 : 0] a
+		.data_o(pixel_in)  // output wire [31 : 0] spo
+	);
+
+`else
+	rom_256x32 U_rom_1 (
+		.a(rom_addr),      // input wire [5 : 0] a
+		.spo(pixel_in)  // output wire [31 : 0] spo
+	);
+`endif	
+	
 endmodule

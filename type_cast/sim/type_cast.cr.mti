@@ -1,5 +1,5 @@
-D:/Gzt/project/conv_kernel/rtl/type_cast/type_cast.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/type_cast/type_cast.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+D:/Gzt/project/ConvNN_FPGA_Accelerator/type_cast/type_cast.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/type_cast/type_cast.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
 -- Compiling program type_cast
 
 Top level modules:

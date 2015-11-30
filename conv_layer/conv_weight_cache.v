@@ -21,19 +21,17 @@ parameter	ARRAY_SIZE			=	6;
 
 //parameter	WEIGHT_SET_NUM		=	2;
 
-// parameter	STAGE_INIT			=	3'd0;
-// parameter	STAGE_PRELOAD		=	3'd1;	
-// parameter	STAGE_SHIFT			=	3'd2;
-// parameter	STAGE_LOAD			=	3'd3;
+// parameter	STATE_INIT			=	3'd0;
+// parameter	STATE_PRELOAD		=	3'd1;	
+// parameter	STATE_SHIFT			=	3'd2;
+// parameter	STATE_LOAD			=	3'd3;
 
-parameter	STAGE_INIT			=	3'd0;
-parameter	STAGE_PRELOAD		=	3'd1;	
-parameter	STAGE_ROW_0			=	3'd2;
-parameter	STAGE_ROW_1			=	3'd3;
-parameter	STAGE_ROW_2			=	3'd4;
-parameter	STAGE_BIAS			=	3'd5;
-parameter	STAGE_LOAD			=	3'd6;
-parameter	STAGE_IDLE			=	3'd7;
+parameter	STATE_INIT			=	3'd0;
+parameter	STATE_PRELOAD		=	3'd1;	
+parameter	STATE_SHIFT			=	3'd2;
+parameter	STATE_BIAS			=	3'd5;
+parameter	STATE_LOAD			=	3'd6;
+parameter	STATE_IDLE			=	3'd7;
 
 input					clk;
 input					rst_n;
@@ -51,9 +49,9 @@ wire	[`DATA_WIDTH-1:0]		r_data;
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		rom_addr	<=	6'b0 ;
-	else if (current_state 	== 	STAGE_ROW_0 || current_state == STAGE_ROW_1 || current_state == STAGE_ROW_2 || current_state == STAGE_BIAS)	// ?!
+	else if (current_state 	== 	STATE_SHIFT || current_state == STATE_BIAS)	// ?!
 		rom_addr	<=	rom_addr + 1 ;
-	else if (current_state	==	STAGE_LOAD || current_state == STAGE_PRELOAD)
+	else if (current_state	==	STATE_LOAD || current_state == STATE_PRELOAD)
 		rom_addr	<=	6'b0 ;
 	else
 		rom_addr	<=	rom_addr;
@@ -62,15 +60,23 @@ end
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		o_weight	<=	32'b0 ;
-	else if (current_state 	== 	STAGE_ROW_0 || current_state == STAGE_ROW_1 || current_state == STAGE_ROW_2 || current_state == STAGE_BIAS)
+	else if (current_state 	== 	STATE_SHIFT || current_state == STATE_BIAS)
 		o_weight	<=	r_data ;
 	else
 		o_weight	<=	32'b0;
 end
+
+`ifdef	RTL_SIMULATION		
+	rom_64x32_sim	U_rom_64x32_sim_0(
+		.addr	(rom_addr),
+		.data_o	(r_data)
+	);
 	
-rom_weight_64x32 U_rom_weight_64x32  (
-	.a		(rom_addr),      // input wire [4 : 0] a
-	.spo	(r_data)  // output wire [31 : 0] spo
-);
+`else
+	rom_weight_64x32 U_rom_weight_64x32  (
+		.a		(rom_addr),      // input wire [4 : 0] a
+		.spo	(r_data)  // output wire [31 : 0] spo
+	);
+`endif	
 
 endmodule

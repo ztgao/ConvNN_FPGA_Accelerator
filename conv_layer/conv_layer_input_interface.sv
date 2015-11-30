@@ -449,6 +449,8 @@ conv_layer_input_cache U_conv_layer_input_cache_0(
 
 );
 
+
+`ifdef	DEBUG
 //	--	Observe the interface state
 always	@(current_state, preload_cycle) begin
 	case (current_state)
@@ -482,6 +484,7 @@ always	@(current_state, preload_cycle) begin
 	endcase
 end
 
+`endif
 
 endmodule
 

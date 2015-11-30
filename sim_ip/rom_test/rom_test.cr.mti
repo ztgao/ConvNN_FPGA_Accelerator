@@ -1,0 +1,15 @@
+D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/tb_rom.v {1 {vlog -work work -vopt {D:\Gzt\project\ConvNN_FPGA_Accelerator\sim_ip\tb_rom.v}
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module tb_rom
+
+Top level modules:
+	tb_rom
+
+} {} {}} D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_64x32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/ConvNN_FPGA_Accelerator/sim_ip/rom_64x32_sim.sv
+Model Technology ModelSim SE-64 vlog 10.1c Compiler 2012.07 Jul 27 2012
+-- Compiling module rom_64x32_sim
+
+Top level modules:
+	rom_64x32_sim
+
+} {} {}}
