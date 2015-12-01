@@ -11,7 +11,7 @@ reg enable;
 reg	idle;
 
 wire 	[31:0]	data;
-wire	[5:0]	rom_addr;
+wire	[5:0]	ext_rom_addr;
 wire	[2:0]	current_state;
 
 wire	[191:0] out_kernel_port;
@@ -62,14 +62,14 @@ conv_layer_input_interface U_conv_layer_input_interface_1(
 //	.idle			(idle),
 	
 // --output
-	.rom_addr		(rom_addr),
+	.ext_rom_addr		(ext_rom_addr),
 	.out_kernel_port(out_kernel_port)
 //	.current_state	(current_state)
 	
 );
 
 rom_64x32 U_rom_1 (
-	.a(rom_addr),      // input wire [5 : 0] a
+	.a(ext_rom_addr),      // input wire [5 : 0] a
 	.spo(data)  // output wire [31 : 0] spo
 );	
 

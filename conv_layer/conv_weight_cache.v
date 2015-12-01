@@ -15,23 +15,7 @@ module conv_weight_cache(
 	
 );
 
-parameter	KERNEL_SIZE			=	3;	//3x3
-parameter	IMAGE_SIZE			=	8;
-parameter	ARRAY_SIZE			=	6;
-
-//parameter	WEIGHT_SET_NUM		=	2;
-
-// parameter	STATE_INIT			=	3'd0;
-// parameter	STATE_PRELOAD		=	3'd1;	
-// parameter	STATE_SHIFT			=	3'd2;
-// parameter	STATE_LOAD			=	3'd3;
-
-parameter	STATE_INIT			=	3'd0;
-parameter	STATE_PRELOAD		=	3'd1;	
-parameter	STATE_SHIFT			=	3'd2;
-parameter	STATE_BIAS			=	3'd5;
-parameter	STATE_LOAD			=	3'd6;
-parameter	STATE_IDLE			=	3'd7;
+`include "../../conv_layer/conv_kernel_param.v"
 
 input					clk;
 input					rst_n;

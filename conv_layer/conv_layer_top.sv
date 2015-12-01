@@ -15,39 +15,45 @@ module conv_layer_top(
 	
 	//--output
 	o_pixel_bus,	// 6x32bit
-	rom_addr,
+	ext_rom_addr,
 	feature
 );
 
+`include "../../conv_layer/conv_kernel_param.v"
 
-parameter	KERNEL_SIZE			=	3;	//3x3
-parameter	IMAGE_SIZE			=	8;
-parameter	ARRAY_SIZE			=	6;
-
-
-input							clk;
-input							rst_n;
+input									clk;
+input									rst_n;
 input	[`DATA_WIDTH-1:0]				data_in;
-input							enable;
+input									enable;
 
-//input	[`DATA_WIDTH-1:0]				data_in;
-//input	[`DATA_WIDTH-1:0]				weight_in;
 
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature;
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
-output	[7:0]					rom_addr;
+output	[7:0]							ext_rom_addr;
 
 //	register connected to covolution kernel
 
 reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
 wire	[`DATA_WIDTH-1:0]				i_weight;
 
-wire	[2:0]					current_state;
-wire	[2:0]					interface_state;
+wire						kernel_array_clear;
+wire						kernel_calc_fin;
 
-wire	[1:0]					input_interface_cmd;
-wire	[1:0]					input_interface_ack;
+wire	[1:0]				input_interface_cmd;
+wire	[1:0]				input_interface_ack;
 
+conv_layer_controller U_conv_layer_controller_0(
+//--input
+	.clk			(clk),
+	.rst_n			(rst_n),
+	.enable			(enable),
+	.input_interface_ack	(input_interface_ack),
+	
+//--output
+	.kernel_array_clear		(kernel_array_clear),
+	.kernel_calc_fin		(kernel_calc_fin),
+	.input_interface_cmd	(input_interface_cmd)
+);
 
 conv_layer_input_interface U_conv_layer_input_interface_0(
 // --input
@@ -59,50 +65,26 @@ conv_layer_input_interface U_conv_layer_input_interface_0(
 	.ack			(input_interface_ack),
 
 // --output
-	.current_state	(interface_state),
-	.rom_addr		(rom_addr),
-	.out_kernel_port(o_pixel_bus)
+	.ext_rom_addr	(ext_rom_addr),
+	.out_kernel_port(o_pixel_bus),
+	.o_weight		(i_weight)
 	
 );
 
 conv_kernel_array U_conv_kernel_array_0(
-	//--input
+//--input
 	.clk			(clk),
 	.rst_n			(rst_n),
 	.i_pixel_bus	(o_pixel_bus),
 	.i_weight		(i_weight),
-	.current_state	(interface_state),
-		
-	//--output	
+	.clear			(kernel_array_clear),
+	
+//--output	
 	.o_pixel_bus	(feature)
 	
 );
 
-conv_layer_controller U_conv_layer_controller_0(
-	
-	//--input
-	.clk			(clk),
-	.rst_n			(rst_n),
-	.enable			(enable),
-	.input_interface_ack	(input_interface_ack),
-	
-	//--output
-	.input_interface_cmd	(input_interface_cmd),
-	.current_state			(current_state)
-//	.kernel_array_cmd		(),
-//	.output_inteface_cmd	(),
-);
 
-conv_weight_cache U_conv_weight_cache_0(
-	//--input
-	.clk				(clk),
-	.rst_n				(rst_n),
-	.current_state		(interface_state),
-	// a signal to indicate the send state, eg. stop, hold or change the rom_addr
-	//--output
-	.o_weight			(i_weight)
-		
-);
 
 
 // conv_layer_output_interface U_conv_layer_output_interface_0(
@@ -111,10 +93,10 @@ conv_weight_cache U_conv_weight_cache_0(
 // activation_layer
 
 
+`ifdef DEBUG
 /////////////////////////////////////////////////////////////////////////////
 // A type cast module for IEEE-754 to real. 
 // When synthesize the project in Vivado, please turn off it.
-
 //	--
 shortreal		o_pixel_bus_observe_0;
 shortreal		o_pixel_bus_observe_1;
@@ -158,5 +140,7 @@ always @(feature) begin
 end
 
 /////////////////////////////////////////////////////////////////////////////
+`endif
+
 
 endmodule

@@ -5,12 +5,14 @@
 `timescale 1ns/1ns
 module tb_conv_layer_top;
 
+
+
 logic 			clk;
 logic 			rst_n;
 logic 			enable;
 
 logic 	[31:0]	pixel_in;
-logic	[`EXT_ADDR_WIDTH-1:0]	rom_addr;
+logic	[`EXT_ADDR_WIDTH-1:0]	ext_rom_addr;
 
 
 logic	[191:0] out_kernel_port;
@@ -46,7 +48,7 @@ initial begin
 	// idle		=	1;
 	// #100
 	// idle		=	0;
-	#10000
+	#20000
 	$stop;
 end	
 	
@@ -57,29 +59,23 @@ conv_layer_top U_conv_layer_top_0(
 	.rst_n			(rst_n),
 	.enable			(enable),
 	.data_in		(pixel_in),
-//	.idle			(idle),
-	
+
 // --output
-	.rom_addr		(rom_addr),
+	.ext_rom_addr		(ext_rom_addr),
 	.o_pixel_bus	(out_kernel_port)
 	
 );
 
-// rom_64x32 U_rom_1 (
-	// .a(rom_addr),      // input wire [5 : 0] a
-	// .spo(pixel_in)  // output wire [31 : 0] spo
-// );
-
 
 `ifdef	RTL_SIMULATION	
 	rom_256x32_sim U_rom_1 (
-		.addr(rom_addr),      // input wire [5 : 0] a
+		.addr(ext_rom_addr),      // input wire [5 : 0] a
 		.data_o(pixel_in)  // output wire [31 : 0] spo
 	);
 
 `else
 	rom_256x32 U_rom_1 (
-		.a(rom_addr),      // input wire [5 : 0] a
+		.a(ext_rom_addr),      // input wire [5 : 0] a
 		.spo(pixel_in)  // output wire [31 : 0] spo
 	);
 `endif	

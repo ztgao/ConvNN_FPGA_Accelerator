@@ -20,7 +20,6 @@ input	[`DATA_WIDTH-1:0]		i_weight;
 output	[`DATA_WIDTH-1:0]		o_pixel;
 
 reg		[`DATA_WIDTH-1:0]		o_pixel;
-//reg		[`DATA_WIDTH-1:0]		o_pixel_reg;
 
 reg		[`DATA_WIDTH-1:0]		mult_a;
 reg		[`DATA_WIDTH-1:0]		mult_b;

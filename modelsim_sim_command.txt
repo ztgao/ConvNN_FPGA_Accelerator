@@ -1,0 +1,38 @@
+vsim -L unisims_ver -L unimacro_ver -L secureip -L work -lib work work.tb_conv_layer_top work.glbl -novopt
+
+virtual type {
+
+ {3'd0 INIT		}			
+ {3'd1 PRELOAD	}
+ {3'd2 SHIFT	}		
+ {3'd5 BIAS		}			
+ {3'd6 LOAD		}			
+ {3'd7 IDLE		}			
+
+} FSM_TYPE;
+
+virtual	type {
+
+ {2'd0 IDLE}
+ {2'd1 PRELOAD_FIN}
+ {2'd2 SHIFT_FIN}
+ {2'd3 LOAD_FIN}
+ 
+} ACK_TYPE;
+
+virtual	type {
+
+ {2'd0 IDLE	}
+ {2'd1 PRELOAD}
+ {2'd2 SHIFT}
+ {2'd3 LOAD	}
+ 
+} CMD_TYPE;
+
+
+virtual function {(FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate;
+virtual function {(FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate;
+
+virtual function {(ACK_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack;
+virtual function {(CMD_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_cmd} intf_cmd;
+

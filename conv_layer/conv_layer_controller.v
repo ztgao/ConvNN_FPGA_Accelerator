@@ -8,34 +8,22 @@ module conv_layer_controller(
 	clk,
 	rst_n,
 	enable,
+	//
 	input_interface_ack,
-	
-	//--output
 	input_interface_cmd,
+	//--output
+	
+	kernel_array_clear,	
+	kernel_calc_fin,
+	
 	current_state
+	
+
 //	kernel_array_cmd,
 //	output_inteface_cmd,
 );
 
-parameter	KERNEL_SIZE			=	3;	//3x3
-parameter	IMAGE_SIZE			=	8;
-parameter	ARRAY_SIZE			=	6;
-
-parameter	ADDR_WIDTH			=	6;
-parameter	ROM_DEPTH			=	64;
-
-parameter	ACK_IDLE			=	2'd0;
-parameter	ACK_PRELOAD_FIN		=	2'd1;
-parameter	ACK_SHIFT_FIN		=	2'd2;
-parameter	ACK_LOAD_FIN		=	2'd3;
-
-parameter	CMD_IDLE			=	2'd0;
-parameter	CMD_PRELOAD			=	2'd1;
-parameter	CMD_SHIFT			=	2'd2;
-parameter	CMD_LOAD			=	2'd3;
-
-parameter	TOTAL_WEIGHT		=	4;
-parameter	TOTAL_SHIFT			=	ARRAY_SIZE;
+`include "../../conv_layer/conv_kernel_param.v"
 
 input					clk;
 input					rst_n;
@@ -53,11 +41,8 @@ output	[2:0]			current_state;
 reg		[2:0]			current_state;
 reg		[2:0]			next_state;
 
-parameter	STATE_INIT			=	3'd0;
-parameter	STATE_PRELOAD		=	3'd1;	
-parameter	STATE_SHIFT			=	3'd2;
-parameter	STATE_LOAD			=	3'd3;
-//parameter	STATE_IDLE			=	3'd7;
+output	reg				kernel_array_clear;
+output	reg				kernel_calc_fin;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -113,7 +98,10 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			STATE_INIT:
-				input_interface_cmd <=	CMD_PRELOAD;
+				if (enable)
+					input_interface_cmd <=	CMD_PRELOAD;
+				else
+					input_interface_cmd	<=	CMD_IDLE;
 				
 			STATE_PRELOAD:
 				if ( input_interface_ack == ACK_PRELOAD_FIN )
@@ -171,6 +159,38 @@ always @(posedge clk, negedge rst_n) begin
 		shift_cycle		<=	3'd0;
 	else
 		shift_cycle	<=	shift_cycle;
+end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		kernel_array_clear	<=	0;
+	else if (input_interface_ack == ACK_SHIFT_FIN)
+		kernel_array_clear	<=	1;
+	else
+		kernel_array_clear	<=	0;
+end
+
+reg		kernel_calc_fin_delay_0;
+reg		kernel_calc_fin_delay_1;
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) begin
+		kernel_calc_fin			<=	0;
+		kernel_calc_fin_delay_0	<=	0;
+	end
+	else begin
+		kernel_calc_fin			<=	kernel_calc_fin_delay_0;
+		kernel_calc_fin_delay_0	<=	kernel_calc_fin_delay_1;
+	end
+end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		kernel_calc_fin_delay_1	<=	0;
+	else if (input_interface_ack == ACK_SHIFT_FIN)
+		kernel_calc_fin_delay_1	<=	1;
+	else
+		kernel_calc_fin_delay_1	<=	0;				
 end
 
 endmodule
