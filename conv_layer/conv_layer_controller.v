@@ -10,15 +10,13 @@ module conv_layer_controller(
 	enable,
 	//
 	input_interface_ack,
-	input_interface_cmd,
 	//--output
 	
+	input_interface_cmd,
 	kernel_array_clear,	
 	kernel_calc_fin,
 	
-	current_state
-	
-
+	feature_idx
 //	kernel_array_cmd,
 //	output_inteface_cmd,
 );
@@ -37,12 +35,13 @@ reg		[1:0]			input_interface_cmd;
 reg		[1:0]			weight_cycle;
 reg		[2:0]			shift_cycle;
 
-output	[2:0]			current_state;
 reg		[2:0]			current_state;
 reg		[2:0]			next_state;
 
-output	reg				kernel_array_clear;
-output	reg				kernel_calc_fin;
+output reg				kernel_array_clear;
+output reg				kernel_calc_fin;
+
+output reg	[1:0]		feature_idx;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -192,6 +191,15 @@ always @(posedge clk, negedge rst_n) begin
 	else
 		kernel_calc_fin_delay_1	<=	0;				
 end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		feature_idx	<=	2'd0;
+	else if(kernel_calc_fin)
+		feature_idx	<=	weight_cycle;
+	else
+		feature_idx	<=	feature_idx;
+end		
 
 endmodule
 		

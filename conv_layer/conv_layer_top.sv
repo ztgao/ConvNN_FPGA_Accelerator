@@ -16,7 +16,8 @@ module conv_layer_top(
 	//--output
 	o_pixel_bus,	// 6x32bit
 	ext_rom_addr,
-	feature
+	feature_idx,
+	feature_output
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
@@ -27,10 +28,10 @@ input	[`DATA_WIDTH-1:0]				data_in;
 input									enable;
 
 
-output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature;
+output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature_output;
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
-output	[7:0]							ext_rom_addr;
-
+output	[`EXT_ADDR_WIDTH-1:0]							ext_rom_addr;
+output	[1:0]							feature_idx;
 //	register connected to covolution kernel
 
 reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
@@ -41,6 +42,13 @@ wire						kernel_calc_fin;
 
 wire	[1:0]				input_interface_cmd;
 wire	[1:0]				input_interface_ack;
+output	[1:0]				feature_idx;
+
+
+wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature;
+
+assign	feature_output	=	(kernel_calc_fin)? feature: {ARRAY_SIZE{`DATA_WIDTH 'b0}};
+
 
 conv_layer_controller U_conv_layer_controller_0(
 //--input
@@ -52,6 +60,7 @@ conv_layer_controller U_conv_layer_controller_0(
 //--output
 	.kernel_array_clear		(kernel_array_clear),
 	.kernel_calc_fin		(kernel_calc_fin),
+	.feature_idx			(feature_idx),
 	.input_interface_cmd	(input_interface_cmd)
 );
 
@@ -131,12 +140,12 @@ shortreal		feature_observe_4;
 shortreal		feature_observe_5;
 
 always @(feature) begin
-	feature_observe_0		=	$bitstoshortreal(feature[(ARRAY_SIZE-0)*`DATA_WIDTH-1:(ARRAY_SIZE-1)*`DATA_WIDTH]);
-	feature_observe_1		=	$bitstoshortreal(feature[(ARRAY_SIZE-1)*`DATA_WIDTH-1:(ARRAY_SIZE-2)*`DATA_WIDTH]);
-	feature_observe_2       =	$bitstoshortreal(feature[(ARRAY_SIZE-2)*`DATA_WIDTH-1:(ARRAY_SIZE-3)*`DATA_WIDTH]);
-	feature_observe_3       =	$bitstoshortreal(feature[(ARRAY_SIZE-3)*`DATA_WIDTH-1:(ARRAY_SIZE-4)*`DATA_WIDTH]);
-	feature_observe_4       =	$bitstoshortreal(feature[(ARRAY_SIZE-4)*`DATA_WIDTH-1:(ARRAY_SIZE-5)*`DATA_WIDTH]);
-	feature_observe_5       =	$bitstoshortreal(feature[(ARRAY_SIZE-5)*`DATA_WIDTH-1:(ARRAY_SIZE-6)*`DATA_WIDTH]);	
+	feature_observe_0		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-0)*`DATA_WIDTH-1:(ARRAY_SIZE-1)*`DATA_WIDTH]);
+	feature_observe_1		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-1)*`DATA_WIDTH-1:(ARRAY_SIZE-2)*`DATA_WIDTH]);
+	feature_observe_2       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-2)*`DATA_WIDTH-1:(ARRAY_SIZE-3)*`DATA_WIDTH]);
+	feature_observe_3       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-3)*`DATA_WIDTH-1:(ARRAY_SIZE-4)*`DATA_WIDTH]);
+	feature_observe_4       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-4)*`DATA_WIDTH-1:(ARRAY_SIZE-5)*`DATA_WIDTH]);
+	feature_observe_5       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-5)*`DATA_WIDTH-1:(ARRAY_SIZE-6)*`DATA_WIDTH]);	
 end
 
 /////////////////////////////////////////////////////////////////////////////

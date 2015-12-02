@@ -1,16 +1,6 @@
 onerror {resume}
-virtual type { \
-IDLE\
-PRELOAD\
-SHIFT\
-LOAD\
-} CMD_TYPE
-virtual type { \
-IDLE\
-PRELOAD_FIN\
-SHIFT_FIN\
-LOAD_FIN\
-} ACK_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
+virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
 virtual type { \
 INIT\
 PRELOAD\
@@ -46,6 +36,7 @@ add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_3
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_4
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/feature_observe_5
 add wave -noupdate -divider Controller
+add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/kernel_calc_fin
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/kernel_array_clear
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_cmd
@@ -70,7 +61,7 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ack
 add wave -noupdate -divider {kernel array}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {144 ns} 0}
+WaveRestoreCursors {{Cursor 1} {455 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 190
 configure wave -valuecolwidth 100
@@ -86,4 +77,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ns} {658 ns}
+WaveRestoreZoom {0 ns} {1344 ns}
