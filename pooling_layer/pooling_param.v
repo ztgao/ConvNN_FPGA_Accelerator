@@ -5,3 +5,4 @@ parameter	INPUT_SIZE	=	6;
 parameter	KERNEL_SIZE	=	2;
 parameter	OUTPUT_SIZE	=	3;
 
+parameter	TOTAL_FEATURE	=	4;

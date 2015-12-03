@@ -1,6 +1,5 @@
 onerror {resume}
-virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
-virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
 virtual type { \
 INIT\
 PRELOAD\
@@ -9,7 +8,8 @@ SHIFT\
 {0x6 LOAD}\
 {0x7 IDLE}\
 } FSM_TYPE
-virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
+virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
 quietly virtual function -install /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate
 quietly virtual function -install /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0 -env /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate
 quietly virtual function -install /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (ACK_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack
@@ -19,6 +19,8 @@ add wave -noupdate -divider top
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/clk
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/rst_n
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/enable
+add wave -noupdate -radix unsigned /tb_conv_layer_top/feature_idx
+add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_controller_0/feature_row
 add wave -noupdate -divider type_cast
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_0
 add wave -noupdate /tb_conv_layer_top/U_conv_layer_top_0/o_pixel_bus_observe_1
@@ -59,9 +61,9 @@ add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ext_rom_addr
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/preload_cycle
 add wave -noupdate -radix unsigned /tb_conv_layer_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ack
-add wave -noupdate -divider {kernel array}
+add wave -noupdate -divider pooling
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {455 ns} 0}
+WaveRestoreCursors {{Cursor 1} {502 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 190
 configure wave -valuecolwidth 100
@@ -77,4 +79,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ns} {1344 ns}
+WaveRestoreZoom {0 ns} {2640 ns}

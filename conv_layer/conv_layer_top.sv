@@ -14,9 +14,10 @@ module conv_layer_top(
 	enable,
 	
 	//--output
-	o_pixel_bus,	// 6x32bit
 	ext_rom_addr,
+	kernel_calc_fin,
 	feature_idx,
+	feature_row,
 	feature_output
 );
 
@@ -29,16 +30,19 @@ input									enable;
 
 
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature_output;
-output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
-output	[`EXT_ADDR_WIDTH-1:0]							ext_rom_addr;
+wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
+output	[`EXT_ADDR_WIDTH-1:0]			ext_rom_addr;
 output	[1:0]							feature_idx;
 //	register connected to covolution kernel
+
+output	[2:0]							feature_row;
 
 reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
 wire	[`DATA_WIDTH-1:0]				i_weight;
 
 wire						kernel_array_clear;
-wire						kernel_calc_fin;
+//wire						kernel_calc_fin;
+output						kernel_calc_fin;
 
 wire	[1:0]				input_interface_cmd;
 wire	[1:0]				input_interface_ack;
@@ -61,6 +65,7 @@ conv_layer_controller U_conv_layer_controller_0(
 	.kernel_array_clear		(kernel_array_clear),
 	.kernel_calc_fin		(kernel_calc_fin),
 	.feature_idx			(feature_idx),
+	.feature_row			(feature_row),
 	.input_interface_cmd	(input_interface_cmd)
 );
 
@@ -139,7 +144,7 @@ shortreal		feature_observe_3;
 shortreal		feature_observe_4;
 shortreal		feature_observe_5;
 
-always @(feature) begin
+always @(feature_output) begin
 	feature_observe_0		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-0)*`DATA_WIDTH-1:(ARRAY_SIZE-1)*`DATA_WIDTH]);
 	feature_observe_1		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-1)*`DATA_WIDTH-1:(ARRAY_SIZE-2)*`DATA_WIDTH]);
 	feature_observe_2       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-2)*`DATA_WIDTH-1:(ARRAY_SIZE-3)*`DATA_WIDTH]);

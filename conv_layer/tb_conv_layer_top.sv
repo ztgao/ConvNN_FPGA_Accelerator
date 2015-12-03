@@ -15,20 +15,23 @@ logic 	[31:0]	pixel_in;
 logic	[`EXT_ADDR_WIDTH-1:0]	ext_rom_addr;
 
 
-logic	[191:0] out_kernel_port;
-logic	[31:0]	out_kernel_port_0_0;
-logic	[31:0]	out_kernel_port_0_1;
-logic	[31:0]	out_kernel_port_0_2;
-logic	[31:0]	out_kernel_port_0_3;
-logic	[31:0]	out_kernel_port_0_4;
-logic	[31:0]	out_kernel_port_0_5;
+logic	[191:0] feature_output;
+logic	[31:0]	feature_output_0_0;
+logic	[31:0]	feature_output_0_1;
+logic	[31:0]	feature_output_0_2;
+logic	[31:0]	feature_output_0_3;
+logic	[31:0]	feature_output_0_4;
+logic	[31:0]	feature_output_0_5;
 
-assign {out_kernel_port_0_0,
-        out_kernel_port_0_1,
-        out_kernel_port_0_2,
-        out_kernel_port_0_3,
-        out_kernel_port_0_4,
-        out_kernel_port_0_5} = out_kernel_port;
+bit				kernel_calc_fin;
+bit		[1:0]	feature_idx;
+
+assign {feature_output_0_0,
+        feature_output_0_1,
+        feature_output_0_2,
+        feature_output_0_3,
+        feature_output_0_4,
+        feature_output_0_5} = feature_output;
 
 always
 	#5 	clk		=	~clk;
@@ -62,9 +65,22 @@ conv_layer_top U_conv_layer_top_0(
 
 // --output
 	.ext_rom_addr		(ext_rom_addr),
-	.o_pixel_bus	(out_kernel_port)
+	.kernel_calc_fin	(kernel_calc_fin),
+	.feature_idx		(feature_idx),
+	.feature_output		(feature_output)
 	
 );
+
+/* pooling_layer_input_cache U_pooling_layer_input_cache_0(
+//--input
+	.clk				(clk),
+	.rst_n				(rst_n),
+	.kernel_calc_fin	(kernel_calc_fin),
+	.data_in			(feature_output),		
+//--.output
+	.data_out			()
+); */
+
 
 
 `ifdef	RTL_SIMULATION	

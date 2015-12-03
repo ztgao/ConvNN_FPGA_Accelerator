@@ -16,7 +16,8 @@ module conv_layer_controller(
 	kernel_array_clear,	
 	kernel_calc_fin,
 	
-	feature_idx
+	feature_idx,
+	feature_row
 //	kernel_array_cmd,
 //	output_inteface_cmd,
 );
@@ -42,6 +43,7 @@ output reg				kernel_array_clear;
 output reg				kernel_calc_fin;
 
 output reg	[1:0]		feature_idx;
+output reg	[1:0]		feature_row;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -199,6 +201,16 @@ always @(posedge clk, negedge rst_n) begin
 		feature_idx	<=	weight_cycle;
 	else
 		feature_idx	<=	feature_idx;
+end	
+
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		feature_row	<=	2'd0;
+	else if(kernel_calc_fin)
+		feature_row	<=	shift_cycle;
+	else
+		feature_row	<=	feature_row;
 end		
 
 endmodule

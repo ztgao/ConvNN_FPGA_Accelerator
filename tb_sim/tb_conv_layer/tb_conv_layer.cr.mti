@@ -1,4 +1,4 @@
-D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_weight_cache.v {1 {vlog -work work -vopt {D:\Gzt\project\conv_kernel\rtl\conv_layer\conv_weight_cache.v}
+D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_weight_cache.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_weight_cache.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_weight_cache
 
@@ -12,12 +12,12 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	rom_256x32_sim
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_kernel_array.v {1 {vlog -work work -vopt {D:\Gzt\project\conv_kernel\rtl\conv_layer\conv_kernel_array.v}
+} {} {}} D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_layer_input_cache.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_layer_input_cache.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module conv_kernel_array
+-- Compiling module pooling_layer_input_cache
 
 Top level modules:
-	conv_kernel_array
+	pooling_layer_input_cache
 
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/tb_conv_layer_top.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
@@ -26,7 +26,14 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	tb_conv_layer_top
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.sv {1 {vlog -work work -vopt -sv {D:\Gzt\project\conv_kernel\rtl\conv_layer\conv_layer_input_interface.sv}
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_kernel_array.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_kernel_array.v
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module conv_kernel_array
+
+Top level modules:
+	conv_kernel_array
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_layer_input_interface
 
@@ -47,13 +54,6 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	rom_64x32_sim
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module conv_layer_top
-
-Top level modules:
-	conv_layer_top
-
 } {} {}} D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_mult_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_mult_sim.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module floating_mult_sim
@@ -61,7 +61,7 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	floating_mult_sim
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_kernel/conv_kernel.v {1 {vlog -work work -vopt {D:\Gzt\project\conv_kernel\rtl\conv_kernel\conv_kernel.v}
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_kernel/conv_kernel.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_kernel/conv_kernel.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_kernel
 
