@@ -19,10 +19,12 @@ input	clk;
 input	rst_n;
 input	kernel_calc_fin;
 
-input	[INPUT_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
-output	[OUTPUT_SIZE*`DATA_WIDTH-1-1:0]	data_out;	//	3
+input		[INPUT_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
+output 		[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_out;	//	3
 
-reg		[KERNEL_SIZE*`DATA_WIDTH-1:0]	cache_array [0:OUTPUT_SIZE-1];		//	2[3]
+reg			[KERNEL_SIZE*`DATA_WIDTH-1:0]	cache_array [0:OUTPUT_SIZE-1];		//	2[3] 32x2
+
+//reg		[1:0]	cache_output_idx;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
@@ -36,13 +38,17 @@ always @(posedge clk, negedge rst_n) begin
 		cache_array[2]	<=	data_in[(INPUT_SIZE-2*KERNEL_SIZE)*`DATA_WIDTH-1 -: KERNEL_SIZE*`DATA_WIDTH];
 	end
 	else begin
-		cache_array[0]	<=	cache_array[0];
-		cache_array[1]	<=  cache_array[1];
-		cache_array[2]	<=  cache_array[2];	
+		cache_array[0]	<=	{cache_array[0][`DATA_WIDTH-1:0],`DATA_WIDTH 'b0};
+		cache_array[1]	<=  {cache_array[1][`DATA_WIDTH-1:0],`DATA_WIDTH 'b0};
+		cache_array[2]	<=  {cache_array[2][`DATA_WIDTH-1:0],`DATA_WIDTH 'b0};	
 	end
 end
 
-assign	data_out	=	{cache_array[0],cache_array[1],cache_array[2]};
+
+assign	data_out	=	{cache_array[0][KERNEL_SIZE*`DATA_WIDTH-1 -: `DATA_WIDTH],
+						 cache_array[1][KERNEL_SIZE*`DATA_WIDTH-1 -: `DATA_WIDTH],
+						 cache_array[2][KERNEL_SIZE*`DATA_WIDTH-1 -: `DATA_WIDTH]};
+
 
 `ifdef DEBUG
 

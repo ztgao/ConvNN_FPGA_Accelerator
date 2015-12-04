@@ -81,6 +81,16 @@ conv_layer_top U_conv_layer_top_0(
 	.data_out			()
 ); */
 
+pooling_layer_top U_pooling_layer_top_0(
+//--input
+	.clk				(clk),
+	.rst_n				(rst_n),
+	.kernel_calc_fin	(kernel_calc_fin),
+	.data_in			(feature_output),		
+//--.output
+	.data_out			()
+);
+
 
 
 `ifdef	RTL_SIMULATION	

@@ -43,7 +43,7 @@ output reg				kernel_array_clear;
 output reg				kernel_calc_fin;
 
 output reg	[1:0]		feature_idx;
-output reg	[1:0]		feature_row;
+output reg	[2:0]		feature_row;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 

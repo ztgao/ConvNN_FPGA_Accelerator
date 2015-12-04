@@ -25,6 +25,8 @@ output	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_out;
 
 reg		[OUTPUT_SIZE`DATA_WIDTH-1:0]	buffer_array [0:TOTAL_FEATURE-1];
 
-always @()
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		
 
 
