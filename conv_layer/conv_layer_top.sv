@@ -16,6 +16,7 @@ module conv_layer_top(
 	//--output
 	ext_rom_addr,
 	kernel_calc_fin,
+	image_calc_fin,
 	feature_idx,
 	feature_row,
 	feature_output
@@ -32,6 +33,8 @@ input									enable;
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature_output;
 wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
 output	[`EXT_ADDR_WIDTH-1:0]			ext_rom_addr;
+
+output									image_calc_fin;
 output	[1:0]							feature_idx;
 //	register connected to covolution kernel
 
@@ -64,6 +67,7 @@ conv_layer_controller U_conv_layer_controller_0(
 //--output
 	.kernel_array_clear		(kernel_array_clear),
 	.kernel_calc_fin		(kernel_calc_fin),
+	.image_calc_fin			(image_calc_fin),
 	.feature_idx			(feature_idx),
 	.feature_row			(feature_row),
 	.input_interface_cmd	(input_interface_cmd)

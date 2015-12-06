@@ -3,7 +3,7 @@
 
 `include "../../global_define.v"
 `timescale 1ns/1ns
-module tb_conv_layer_top;
+module tb_top;
 
 
 
@@ -25,6 +25,8 @@ logic	[31:0]	feature_output_0_5;
 
 bit				kernel_calc_fin;
 bit		[1:0]	feature_idx;
+bit		[2:0]	feature_row;
+bit				image_calc_fin;
 
 assign {feature_output_0_0,
         feature_output_0_1,
@@ -51,10 +53,21 @@ initial begin
 	// idle		=	1;
 	// #100
 	// idle		=	0;
-	#20000
+	#15000
 	$stop;
 end	
 	
+image_manager U_image_manager(
+//--input
+	.clk(clk),
+	.rst_n(rst_n),
+	.enable(enable),
+//--output
+	.layer_0_calc_fin(image_calc_fin),
+	
+	.data_out()
+);
+
 	
 conv_layer_top U_conv_layer_top_0(	
 // --input
@@ -66,7 +79,9 @@ conv_layer_top U_conv_layer_top_0(
 // --output
 	.ext_rom_addr		(ext_rom_addr),
 	.kernel_calc_fin	(kernel_calc_fin),
+	.image_calc_fin		(image_calc_fin),
 	.feature_idx		(feature_idx),
+	.feature_row		(feature_row),
 	.feature_output		(feature_output)
 	
 );
@@ -86,7 +101,9 @@ pooling_layer_top U_pooling_layer_top_0(
 	.clk				(clk),
 	.rst_n				(rst_n),
 	.kernel_calc_fin	(kernel_calc_fin),
-	.data_in			(feature_output),		
+	.data_in			(feature_output),
+	.feature_idx		(feature_idx),
+	.feature_row		(feature_row),
 //--.output
 	.data_out			()
 );
