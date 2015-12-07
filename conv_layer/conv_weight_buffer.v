@@ -1,10 +1,10 @@
 // version 1.0 -- setup
 // Description:
-// Consider that the weight set will not change in a specific network, so I try to put them in
+// Consider the weight set will not change in a specific network, so I try to put them in
 // a ROM IP by Xilinx. In the test, the ROM is configured as a 32x4B rom and I will put two set
 // weight.
 `include "../../global_define.v"
-module conv_weight_cache(
+module conv_weight_buffer(
 	//--input
 	clk,
 	rst_n,
@@ -24,7 +24,7 @@ input	[2:0]			current_state;
 output	[`DATA_WIDTH-1:0]		o_weight;
 reg		[`DATA_WIDTH-1:0]		o_weight;
 
-reg		[5:0]			rom_addr;	
+reg		[WEIGHT_ROM_ADDR_WIDTH-1:0]		rom_addr;	
 
 
 wire	[`DATA_WIDTH-1:0]		r_data;
@@ -32,22 +32,22 @@ wire	[`DATA_WIDTH-1:0]		r_data;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		rom_addr	<=	6'b0 ;
+		rom_addr	<=	0 ;
 	else if (current_state 	== 	STATE_SHIFT || current_state == STATE_BIAS)	// ?!
-		rom_addr	<=	rom_addr + 1 ;
+		rom_addr	<=	rom_addr + 1'b1 ;
 	else if (current_state	==	STATE_LOAD || current_state == STATE_PRELOAD)
-		rom_addr	<=	6'b0 ;
+		rom_addr	<=	0 ;
 	else
 		rom_addr	<=	rom_addr;
 end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		o_weight	<=	32'b0 ;
+		o_weight	<=	`DATA_WIDTH 'b0 ;
 	else if (current_state 	== 	STATE_SHIFT || current_state == STATE_BIAS)
 		o_weight	<=	r_data ;
 	else
-		o_weight	<=	32'b0;
+		o_weight	<=	`DATA_WIDTH 'b0 ;
 end
 
 `ifdef	RTL_SIMULATION		

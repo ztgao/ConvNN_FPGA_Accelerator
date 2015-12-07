@@ -3,11 +3,11 @@
 
 `include "../../global_define.v"
 
-module	pooling_layer_input_buffer_0(
+module	pooling_input_interface(
 //--input
 	clk,
 	rst_n,
-	kernel_calc_fin,
+	valid,
 	block_idx,
 	data_in,
 //--output
@@ -18,7 +18,7 @@ module	pooling_layer_input_buffer_0(
 
 input	clk;
 input	rst_n;
-input	kernel_calc_fin;
+input	valid;
 
 input	[2:0]	block_idx;
 
@@ -43,7 +43,7 @@ reg			[`DATA_WIDTH-1:0]	buffer_0 [0:KERNEL_SIZE-1];		//	2[3] 32x2
 	// if(!rst_n) begin
 		// {buffer_0[0],buffer_0[1],buffer_0[2],buffer_0[3]}	<=	KERNEL_SIZE*KERNEL_SIZE*`DATA_WIDTH 'h0;
 	// end	
-	// else if (kernel_calc_fin) begin
+	// else if (valid) begin
 		// {buffer_0[0],buffer_0[1]}	<=	data_in;
 	// end
 	// else begin
@@ -56,7 +56,7 @@ always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
 		{buffer_0[0],buffer_0[1]}	<=	KERNEL_SIZE*`DATA_WIDTH 'h0;
 	end	
-	else if (kernel_calc_fin) begin
+	else if (valid) begin
 		{buffer_0[0],buffer_0[1]}	<=	data_in;
 	end
 	else begin
@@ -65,14 +65,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-
-
-
-
 assign	data_out	=	buffer_0[0];
-
-
-
 
 
 `ifdef DEBUG

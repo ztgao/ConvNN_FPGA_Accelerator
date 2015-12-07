@@ -9,7 +9,7 @@ parameter	ARRAY_SIZE			=	6;
 
 //	--	
 parameter	TOTAL_WEIGHT		=	4;
-parameter	TOTAL_SHIFT			=	ARRAY_SIZE;
+parameter	TOTAL_ROW			=	ARRAY_SIZE;
 
 //	--	Input Interface	States
 
@@ -19,6 +19,19 @@ parameter	STATE_SHIFT			=	3'd2;
 parameter	STATE_BIAS			=	3'd5;
 parameter	STATE_LOAD			=	3'd6;
 parameter	STATE_IDLE			=	3'd7;
+
+//	--	Input Buffer
+
+parameter	BUFFER_ROW			=	KERNEL_SIZE;	//	3
+parameter	BUFFER_ROW_WIDTH	=	2;
+
+parameter	BUFFER_COL			=	IMAGE_SIZE;		//	8
+parameter	BUFFER_COL_WIDTH	=	4;	//	log2(8) + 1
+
+//	--	Input Weight Buffer
+
+parameter	WEIGHT_ROM_DEPTH	=	64;
+parameter	WEIGHT_ROM_ADDR_WIDTH	=	6; 
 
 //	--	Intereaction Signals
 

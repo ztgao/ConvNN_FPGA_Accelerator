@@ -5,17 +5,15 @@
 // The conv_kernel is 3x3.
 
 `include "../../global_define.v"
-module conv_layer_top(
-	
-	//--input
+module conv_layer_top(	
+//--input
 	clk,
 	rst_n,
-	data_in,	// 32 bit
-	enable,
-	
-	//--output
+	data_in,	
+	enable,	
+//--output
 	ext_rom_addr,
-	kernel_calc_fin,
+	valid,
 	image_calc_fin,
 	feature_idx,
 	feature_row,
@@ -44,8 +42,7 @@ reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
 wire	[`DATA_WIDTH-1:0]				i_weight;
 
 wire						kernel_array_clear;
-//wire						kernel_calc_fin;
-output						kernel_calc_fin;
+output						valid;
 
 wire	[1:0]				input_interface_cmd;
 wire	[1:0]				input_interface_ack;
@@ -54,19 +51,17 @@ output	[1:0]				feature_idx;
 
 wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature;
 
-assign	feature_output	=	(kernel_calc_fin)? feature: {ARRAY_SIZE{`DATA_WIDTH 'b0}};
+assign	feature_output	=	(valid)? feature: {ARRAY_SIZE{`DATA_WIDTH 'b0}};
 
 
 conv_layer_controller U_conv_layer_controller_0(
 //--input
-	.clk			(clk),
-	.rst_n			(rst_n),
-	.enable			(enable),
-	.input_interface_ack	(input_interface_ack),
-	
+	.clk					(clk),
+	.rst_n					(rst_n),
+	.enable					(enable),
+	.input_interface_ack	(input_interface_ack),	
 //--output
-	.kernel_array_clear		(kernel_array_clear),
-	.kernel_calc_fin		(kernel_calc_fin),
+	.valid					(valid),
 	.image_calc_fin			(image_calc_fin),
 	.feature_idx			(feature_idx),
 	.feature_row			(feature_row),
@@ -81,12 +76,10 @@ conv_layer_input_interface U_conv_layer_input_interface_0(
 	.data_in		(data_in),
 	.cmd			(input_interface_cmd),
 	.ack			(input_interface_ack),
-
 // --output
 	.ext_rom_addr	(ext_rom_addr),
-	.out_kernel_port(o_pixel_bus),
-	.o_weight		(i_weight)
-	
+	.data_out		(o_pixel_bus),
+	.o_weight		(i_weight)	
 );
 
 conv_kernel_array U_conv_kernel_array_0(
@@ -95,20 +88,10 @@ conv_kernel_array U_conv_kernel_array_0(
 	.rst_n			(rst_n),
 	.i_pixel_bus	(o_pixel_bus),
 	.i_weight		(i_weight),
-	.clear			(kernel_array_clear),
-	
+	.clear			(valid),	
 //--output	
-	.o_pixel_bus	(feature)
-	
+	.o_pixel_bus	(feature)	
 );
-
-
-
-
-// conv_layer_output_interface U_conv_layer_output_interface_0(
-// );
-
-// activation_layer
 
 
 `ifdef DEBUG

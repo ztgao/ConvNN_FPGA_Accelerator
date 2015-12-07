@@ -13,8 +13,8 @@ module conv_layer_controller(
 	//--output
 	
 	input_interface_cmd,
-	kernel_array_clear,	
-	kernel_calc_fin,
+//	kernel_array_clear,	
+	valid,
 	
 	image_calc_fin,
 	
@@ -35,14 +35,14 @@ input	[1:0]			input_interface_ack;
 output 	[1:0]			input_interface_cmd;
 reg		[1:0]			input_interface_cmd;
 
-reg		[1:0]			weight_cycle;
-reg		[2:0]			shift_cycle;
+reg		[1:0]			weight_idx;
+reg		[2:0]			row_idx;
 
 reg		[2:0]			current_state;
 reg		[2:0]			next_state;
 
-output reg				kernel_array_clear;
-output reg				kernel_calc_fin;
+//output reg				kernel_array_clear;
+output reg				valid;
 
 output reg				image_calc_fin;
 
@@ -60,7 +60,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-always @(current_state, input_interface_ack, weight_cycle) begin
+always @(current_state, input_interface_ack, weight_idx) begin
 	case (current_state)
 		STATE_INIT: 
 			next_state	=	STATE_PRELOAD;
@@ -73,8 +73,8 @@ always @(current_state, input_interface_ack, weight_cycle) begin
 		
 		STATE_SHIFT: begin
 			if ( input_interface_ack == ACK_SHIFT_FIN ) begin
-				if ( weight_cycle == TOTAL_WEIGHT - 1  ) begin
-					if ( shift_cycle  == TOTAL_SHIFT - 1 )
+				if ( weight_idx == TOTAL_WEIGHT - 1  ) begin
+					if ( row_idx  == TOTAL_ROW - 1 )
 						next_state	<=	STATE_PRELOAD;
 					else
 						next_state	=	STATE_LOAD;
@@ -118,8 +118,8 @@ always @(posedge clk, negedge rst_n) begin
 					
 			STATE_SHIFT:
 				if ( input_interface_ack == ACK_SHIFT_FIN) begin
-					if ( weight_cycle == TOTAL_WEIGHT - 1 ) begin
-						if ( shift_cycle  == TOTAL_SHIFT - 1 )
+					if ( weight_idx == TOTAL_WEIGHT - 1 ) begin
+						if ( row_idx  == TOTAL_ROW - 1 )
 							input_interface_cmd	<=	CMD_PRELOAD;
 						else
 							input_interface_cmd	<=	CMD_LOAD;
@@ -146,65 +146,58 @@ end
 //	--	
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
-		weight_cycle	<=	2'd0;
+		weight_idx	<=	2'd0;
 	else if ( input_interface_ack == ACK_SHIFT_FIN) begin
-		if ( weight_cycle == TOTAL_WEIGHT - 1 )
-			weight_cycle	<=	2'd0;
+		if ( weight_idx == TOTAL_WEIGHT - 1 )
+			weight_idx	<=	2'd0;
 		else
-			weight_cycle	<=	weight_cycle	+ 1'd1;
+			weight_idx	<=	weight_idx	+ 1'd1;
 	end 
 	else
-		weight_cycle	<=	weight_cycle;	
+		weight_idx	<=	weight_idx;	
 end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
-		shift_cycle		<=	3'd0;
-	else if (input_interface_ack == ACK_SHIFT_FIN && weight_cycle == TOTAL_WEIGHT - 1) 
-		shift_cycle		<=	shift_cycle	+ 1'b1;	
-	else if ( shift_cycle == TOTAL_SHIFT)
-		shift_cycle		<=	3'd0;
+		row_idx		<=	3'd0;
+	else if (input_interface_ack == ACK_SHIFT_FIN && weight_idx == TOTAL_WEIGHT - 1) 
+		row_idx		<=	row_idx	+ 1'b1;	
+	else if ( row_idx == TOTAL_ROW)
+		row_idx		<=	3'd0;
 	else
-		shift_cycle	<=	shift_cycle;
+		row_idx	<=	row_idx;
 end
 
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n)
-		kernel_array_clear	<=	0;
-	else if (input_interface_ack == ACK_SHIFT_FIN)
-		kernel_array_clear	<=	1;
-	else
-		kernel_array_clear	<=	0;
-end
-
-reg		kernel_calc_fin_delay_0;
-reg		kernel_calc_fin_delay_1;
+//-------------------------------------
+reg		valid_delay_0;
+reg		valid_delay_1;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
-		kernel_calc_fin			<=	0;
-		kernel_calc_fin_delay_0	<=	0;
+		valid			<=	0;
+		valid_delay_0	<=	0;
 	end
 	else begin
-		kernel_calc_fin			<=	kernel_calc_fin_delay_0;
-		kernel_calc_fin_delay_0	<=	kernel_calc_fin_delay_1;
+		valid			<=	valid_delay_0;
+		valid_delay_0	<=	valid_delay_1;
 	end
 end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		kernel_calc_fin_delay_1	<=	0;
+		valid_delay_1	<=	0;
 	else if (input_interface_ack == ACK_SHIFT_FIN)
-		kernel_calc_fin_delay_1	<=	1;
+		valid_delay_1	<=	1;
 	else
-		kernel_calc_fin_delay_1	<=	0;				
+		valid_delay_1	<=	0;				
 end
+//-------------------------------------
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		feature_idx	<=	2'd0;
-	else if(kernel_calc_fin)
-		feature_idx	<=	weight_cycle;
+	else if(valid)
+		feature_idx	<=	weight_idx;
 	else
 		feature_idx	<=	feature_idx;
 end	
@@ -213,8 +206,8 @@ end
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		feature_row	<=	2'd0;
-	else if(kernel_calc_fin)
-		feature_row	<=	shift_cycle;
+	else if(valid)
+		feature_row	<=	row_idx;
 	else
 		feature_row	<=	feature_row;
 end
@@ -222,14 +215,14 @@ end
 // always @(posedge clk, negedge rst_n) begin
 	// if(!rst_n) 
 		// image_calc_fin	<=	0;
-	// else if(kernel_calc_fin && feature_idx == TOTAL_WEIGHT-1 && feature_row = TOTAL_SHIFT- 1)
+	// else if(valid && feature_idx == TOTAL_WEIGHT-1 && feature_row = TOTAL_ROW- 1)
 		// image_calc_fin	<=	1;
 	// else
 		// image_calc_fin	<=	0;
 // end	
 
 always @(*)	begin
-	if(kernel_calc_fin && feature_idx == TOTAL_WEIGHT-1 && feature_row == TOTAL_SHIFT- 1)
+	if(valid && feature_idx == TOTAL_WEIGHT-1 && feature_row == TOTAL_ROW- 1)
 		image_calc_fin	=	1;
 	else
 		image_calc_fin	=	0;

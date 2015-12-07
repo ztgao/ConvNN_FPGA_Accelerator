@@ -23,7 +23,7 @@ logic	[31:0]	feature_output_0_3;
 logic	[31:0]	feature_output_0_4;
 logic	[31:0]	feature_output_0_5;
 
-bit				kernel_calc_fin;
+bit				valid;
 bit		[1:0]	feature_idx;
 bit		[2:0]	feature_row;
 bit				image_calc_fin;
@@ -78,7 +78,7 @@ conv_layer_top U_conv_layer_top_0(
 
 // --output
 	.ext_rom_addr		(ext_rom_addr),
-	.kernel_calc_fin	(kernel_calc_fin),
+	.valid	(valid),
 	.image_calc_fin		(image_calc_fin),
 	.feature_idx		(feature_idx),
 	.feature_row		(feature_row),
@@ -90,7 +90,7 @@ conv_layer_top U_conv_layer_top_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.kernel_calc_fin	(kernel_calc_fin),
+	.valid	(valid),
 	.data_in			(feature_output),		
 //--.output
 	.data_out			()
@@ -100,7 +100,7 @@ pooling_layer_top U_pooling_layer_top_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.kernel_calc_fin	(kernel_calc_fin),
+	.valid				(valid),
 	.data_in			(feature_output),
 	.feature_idx		(feature_idx),
 	.feature_row		(feature_row),

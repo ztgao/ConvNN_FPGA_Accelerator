@@ -7,7 +7,7 @@ module	pooling_layer_top(
 //--input
 	clk,
 	rst_n,	
-	kernel_calc_fin,
+	valid,
 	feature_idx,
 	feature_row,
 	data_in,	
@@ -19,7 +19,7 @@ module	pooling_layer_top(
 
 input	clk;
 input	rst_n;
-input	kernel_calc_fin;
+input	valid;
 
 input	[1:0]	feature_idx;
 input	[2:0]	feature_row;
@@ -36,13 +36,14 @@ wire	[`DATA_WIDTH-1:0]	data_from_output_interface_0;
 
 
 wire	valid;
+wire	pooling_valid;
 
 reg		[2:0]	block_idx;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
 		block_idx	<=	3'b0;
-	else if(kernel_calc_fin)
+	else if(valid)
 		block_idx	<=	feature_idx;
 	else
 		block_idx	<=	block_idx;
@@ -55,20 +56,19 @@ reg	[2:0]	feature_row_delay_0;
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
 		feature_row_delay_0	<=	3'b0;
-	else if(kernel_calc_fin)
+	else if(valid)
 		feature_row_delay_0	<=	feature_row;
 	else
 		feature_row_delay_0	<=	feature_row_delay_0;
 end
 
-
 //-----------------------------------------------
 
-pooling_layer_input_buffer U_pooling_layer_input_buffer_0(
+pooling_input_interface U_pooling_input_interface_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.kernel_calc_fin	(kernel_calc_fin),
+	.valid	(valid),
 	.data_in			(data_in[INPUT_SIZE*`DATA_WIDTH-1 -: KERNEL_SIZE*`DATA_WIDTH]),		
 //--.output
 	.data_out			(data_from_cache_0)
@@ -81,11 +81,11 @@ pooling_array U_pooling_array_0(
 	.rst_n		(rst_n),
 	.data_in	(data_from_cache_0),
 	
-	.kernel_calc_fin(kernel_calc_fin),
+	.kernel_calc_fin		(valid),
 	.feature_idx(block_idx),
 	.feature_row(feature_row_delay_0),
 //--output
-	.valid		(valid),
+	.valid		(pooling_valid),
 	.data_out	(data_from_array_0)	
 );
 
@@ -99,7 +99,7 @@ pooling_output_interface U_pooling_output_interface_0(
 	.feature_idx(block_idx),
 	.feature_row(feature_row_delay_0),
 	.data_in	(data_from_array_0),
-	.valid		(valid),
+	.valid		(pooling_valid),
 //--output
 	.data_out	(data_from_output_interface_0)
 );
