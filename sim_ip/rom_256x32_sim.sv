@@ -16,7 +16,7 @@ output reg	[WIDTH-1:0]			data_o;
 bit		[WIDTH-1:0]		memory		[0:DEPTH-1];
 
 initial begin
-	$readmemb("rom_256x32.mif",memory);
+	$readmemb("rom_256x32_fw.mif",memory);
 end
 
 always @(addr) begin

@@ -1,16 +1,16 @@
-D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_max_cell.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_max_cell.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module pooling_max_cell
-
-Top level modules:
-	pooling_max_cell
-
-} {} {}} D:/Gzt/project/conv_kernel/rtl/sim_ip/rom_256x32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/sim_ip/rom_256x32_sim.sv
+D:/Gzt/project/conv_kernel/rtl/sim_ip/rom_256x32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/sim_ip/rom_256x32_sim.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module rom_256x32_sim
 
 Top level modules:
 	rom_256x32_sim
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_max_cell.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_max_cell.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module pooling_max_cell
+
+Top level modules:
+	pooling_max_cell
 
 } {} {}} D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_layer_top.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
@@ -18,6 +18,13 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 
 Top level modules:
 	pooling_layer_top
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_input_interface.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module conv_layer_input_interface
+
+Top level modules:
+	conv_layer_input_interface
 
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_kernel_array.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_kernel_array.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
@@ -54,6 +61,13 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	rom_64x32_sim
 
+} {} {}} D:/Gzt/project/conv_kernel/rtl/network/network_manager.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/network/network_manager.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module network_manager
+
+Top level modules:
+	network_manager
+
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_layer_top
@@ -67,13 +81,6 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 
 Top level modules:
 	floating_mult_sim
-
-} {} {}} D:/Gzt/project/conv_kernel/rtl/network/image_manager.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/network/image_manager.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module image_manager
-
-Top level modules:
-	image_manager
 
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_kernel/conv_kernel.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_kernel/conv_kernel.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
@@ -103,13 +110,6 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	pooling_input_interface
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_comparator_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_comparator_sim.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module floating_comparator_sim
-
-Top level modules:
-	floating_comparator_sim
-
 } {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_controller.v
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module conv_layer_controller
@@ -123,5 +123,12 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 
 Top level modules:
 	conv_layer_input_buffer
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_comparator_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/sim_ip/floating_comparator_sim.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module floating_comparator_sim
+
+Top level modules:
+	floating_comparator_sim
 
 } {} {}}

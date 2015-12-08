@@ -10,7 +10,7 @@ module	pooling_output_interface(
 	feature_idx,
 	feature_row,
 	data_in,
-	valid,
+	input_valid,
 //--output
 	data_out
 );
@@ -22,7 +22,7 @@ input		clk;
 input		rst_n;
 input	[1:0]	feature_idx;
 input	[2:0]	feature_row;
-input 		valid;
+input 		input_valid;
 
 input		[`DATA_WIDTH-1:0]	data_in;	
 output reg 	[`DATA_WIDTH-1:0]	data_out;
@@ -36,7 +36,7 @@ always @(posedge clk, negedge rst_n) begin
 		buffer[2]	<=	`DATA_WIDTH 'b0;
 		buffer[3]	<=	`DATA_WIDTH 'b0;
 	end
-	else if (valid) begin
+	else if (input_valid) begin
 		case(feature_row)
 			3'd1, 3'd3, 3'd5: begin
 				case (feature_idx)
@@ -63,11 +63,20 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
+reg	input_valid_delay_0;
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		input_valid_delay_0 <= 0;
+	else
+		input_valid_delay_0	<= input_valid;
+end
+
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		data_out	<=	`DATA_WIDTH 'b0;
-	else begin
+	else if (input_valid_delay_0) begin
 		case(feature_row)
 			3'd1, 3'd3, 3'd5: begin
 				case(feature_idx)

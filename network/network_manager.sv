@@ -2,36 +2,40 @@
 //				-- 	setup
 
 `include "../../global_define.v"
-module	image_manager(
+module	network_manager(
 //--input
 	clk,
 	rst_n,
-	enable,
+	start,
 	layer_0_calc_fin,
 //--output
-	layer_0_calc_fin,
+
+	layer_0_en,
 	
 	data_out
 );
 
-`include "../../network/image_param.v"
+`include "../../network/network_param.v"
 
 input		clk;
 input		rst_n;
-input		enable;	
+input		start;	
 
 input		layer_0_calc_fin;
 
 output		data_out;
+output reg	layer_0_en;
 
 
 reg			[3:0]	input_image_idx;
 
+wire	lastImage	=	(input_image_idx	==	IMAGE_NUM - 1);
+	
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
 		input_image_idx	<=	4'b0;			
 	else if(layer_0_calc_fin)
-		if(input_image_idx	==	IMAGE_NUM - 1)
+		if ( lastImage )
 			input_image_idx	<=	4'b0;
 		else 
 			input_image_idx	<=	input_image_idx + 1'b1;
@@ -39,7 +43,16 @@ always @(posedge clk, negedge rst_n) begin
 		input_image_idx	<=	input_image_idx;
 end
 
-
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		layer_0_en	<=	0;
+	else if(lastImage && layer_0_calc_fin)
+		layer_0_en	<=	0;
+	else if(start)
+		layer_0_en	<=	1;
+	else
+		layer_0_en	<=	layer_0_en;
+end
 
 endmodule
 		

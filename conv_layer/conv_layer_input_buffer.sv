@@ -52,8 +52,8 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_INIT: 
-				buffer_array_0	<=	{ IMAGE_SIZE {`DATA_WIDTH 'h0}};			
+			STATE_IDLE: 
+				buffer_array_0	<=	buffer_array_0;				
 						
 			STATE_PRELOAD: 
 				if (preload_cycle < BUFFER_ROW) begin				
@@ -77,9 +77,7 @@ always @(posedge clk, negedge rst_n) begin
 				else 
 					buffer_array_0	<=	buffer_array_0;
 			
-			STATE_IDLE: 
-				buffer_array_0	<=	buffer_array_0;			
-						
+							
 			default: 
 				buffer_array_0	<=	buffer_array_0;
 		endcase
@@ -92,10 +90,9 @@ always @(posedge clk, negedge rst_n) begin
 		buffer_array_1	<=	{ IMAGE_SIZE {`DATA_WIDTH 'h0}};
 	else begin
 		case (current_state)
-			
-			STATE_INIT: 
-				buffer_array_1	<=	{ IMAGE_SIZE {`DATA_WIDTH 'h0}};			
-				
+								
+			STATE_IDLE: 
+				buffer_array_1	<=	buffer_array_1;				
 
 			STATE_PRELOAD: begin
 				if (preload_cycle < BUFFER_ROW) begin			
@@ -121,8 +118,7 @@ always @(posedge clk, negedge rst_n) begin
 				else 
 					buffer_array_1	<=	buffer_array_1;				
 
-			STATE_IDLE: 
-				buffer_array_1	<=	buffer_array_1;						
+					
 		
 			default: 
 				buffer_array_1	<=	buffer_array_1;
@@ -138,8 +134,8 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_INIT: 
-				buffer_array_2	<=	{ IMAGE_SIZE {`DATA_WIDTH 'h0}};			
+			STATE_IDLE: 
+				buffer_array_2	<=	buffer_array_2;					
 			
 			STATE_PRELOAD: 
 				case (col_index)
@@ -175,9 +171,6 @@ always @(posedge clk, negedge rst_n) begin
 						buffer_array_2	<=	buffer_array_2;
 				endcase
 
-			STATE_IDLE: 
-				buffer_array_2	<=	buffer_array_2;			
-		
 			default: 
 				buffer_array_2	<=	buffer_array_2;
 	

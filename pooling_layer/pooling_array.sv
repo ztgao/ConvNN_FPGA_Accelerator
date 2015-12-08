@@ -11,9 +11,9 @@ module	pooling_array(
 //	clear,
 	feature_idx,
 	feature_row,
-	kernel_calc_fin,
+	input_valid,
 //--output
-	valid,
+	output_valid,
 	data_out	
 );
 
@@ -29,11 +29,11 @@ input	rst_n;
 input	[1:0]	feature_idx;
 input	[2:0]	feature_row;
 
-input	kernel_calc_fin;
+input	input_valid;
 
 output	[`DATA_WIDTH-1:0]	data_out;
 
-output reg	valid;
+output reg	output_valid;
 
 reg		clear;
 reg		[`DATA_WIDTH-1:0]	prev_result [0:TOTAL_FEATURE - 1];
@@ -62,7 +62,7 @@ always @(*) begin
 	case (current_state)
 		
 		STATE_IDLE: 
-			if(kernel_calc_fin)
+			if(input_valid)
 				next_state	=	STATE_CMP;
 			else
 				next_state	=	STATE_IDLE;
@@ -102,18 +102,18 @@ end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		valid	<=	0;
+		output_valid	<=	0;
 	else if (cmp_idx == 2'd2)
-		valid	<=	1;
+		output_valid	<=	1;
 	else
-		valid	<=	0;
+		output_valid	<=	0;
 end
 
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		clear_prev_result	<=	0;
-	else if (valid && feature_idx == TOTAL_FEATURE - 1) 
+	else if (output_valid && feature_idx == TOTAL_FEATURE - 1) 
 		case (feature_row)
 			3'd1, 3'd3,3'd5:
 				clear_prev_result	<=	1;
@@ -132,7 +132,7 @@ always @(posedge clk, negedge rst_n) begin
 		prev_result[3]	<=  `DATA_WIDTH 'b0;
 	end	
 	
-	else if (valid) 
+	else if (output_valid) 
 		case (feature_idx)
 			2'd0: prev_result[0]	<= 	result;
 			2'd1: prev_result[1]	<= 	result;
@@ -167,7 +167,7 @@ always @(*) begin
 		data_in_reg	= data_in;
 end
 
-assign data_out = (valid)? result : `DATA_WIDTH 'b0;
+assign data_out = (output_valid)? result : `DATA_WIDTH 'b0;
 
 			
 pooling_max_cell U_pooling_max_cell_0(
@@ -175,7 +175,7 @@ pooling_max_cell U_pooling_max_cell_0(
 	.clk	(clk),
 	.rst_n	(rst_n),
 	.a		(data_in_reg),
-	.clear	(valid),
+	.clear	(output_valid),
 //--output	
 	.result	(result)
 );

@@ -65,36 +65,51 @@ wire	[IMAGE_SIZE*`DATA_WIDTH-1:0]	data_from_buffer;
 wire	lastShift;
 wire	lastRow;
 wire	lastCol;
+wire	lastPreloadCycle;	
 
-assign	lastShift	=	(shift_idx == KERNEL_SIZE - 1);
-assign	lastRow		=	(buffer_row_idx == BUFFER_ROW - 1);
-assign	lastCol		=	(buffer_col_idx	== BUFFER_COL - 1);
+//	todo list
+//	1. abstract the signal
+
+assign	lastShift	=	(shift_idx == KERNEL_SIZE - 1)? 1:0;
+assign	lastRow		=	(buffer_row_idx == BUFFER_ROW - 1)? 1:0;
+assign	lastCol		=	(buffer_col_idx	== BUFFER_COL - 1)?	1:0;
+assign	lastPreloadCycle	=	(preload_cycle == BUFFER_ROW - 1)? 1:0;
+
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		current_state	<=	STATE_IDLE;
+		current_state	<=	STATE_INIT;
 	else begin
 		if (enable)
 			current_state	<=	next_state;
 		else
-			current_state	<= 	STATE_IDLE;
+			current_state	<= 	current_state;
 	end
 end
 
 always @(current_state, buffer_col_idx, shift_idx, preload_cycle,cmd) begin
 	case (current_state)	
 		
-//  Caution: whenever add a new state which could run into IDLE, 
-//			 you should add a specific exit for this state.	
-		STATE_IDLE: 
-			if ( cmd == CMD_SHIFT)
-				next_state	=	STATE_SHIFT;
-			else if ( cmd == CMD_LOAD )
-				next_state	=	STATE_LOAD;
+		STATE_INIT: begin 
+			if ( cmd == CMD_PRELOAD )
+				next_state	=	STATE_PRELOAD;
 			else
-				next_state	=	STATE_IDLE;
-				
+				next_state	=	STATE_INIT;
+		end
+		
+		STATE_PRELOAD: 
+			if ( cmd == CMD_SHIFT ) 
+				next_state	=	STATE_SHIFT;
+			else begin
+//				if ( preload_cycle == BUFFER_ROW - 1 && buffer_col_idx == BUFFER_COL - 1)
+				if ( lastPreloadCycle && lastCol)
+					next_state	=	STATE_IDLE;
+				else
+					next_state	=	STATE_PRELOAD;				
+			end
+		
 		STATE_SHIFT: 
+//			if (shift_idx	== 	KERNEL_SIZE - 1  && buffer_row_idx == BUFFER_ROW - 1)
 			if ( lastShift  && lastRow )
 				next_state	=	STATE_BIAS;
 			else
@@ -109,17 +124,69 @@ always @(current_state, buffer_col_idx, shift_idx, preload_cycle,cmd) begin
 				next_state	=	STATE_IDLE;
 			
 		STATE_LOAD: 
+//			if ( buffer_col_idx == BUFFER_COL - 1 )
 			if ( lastCol )
 				next_state	=	STATE_IDLE;
 			else if ( cmd == CMD_SHIFT )
 				next_state	=	STATE_SHIFT;				 
 			else
 				next_state	=	STATE_LOAD;
+				
+//  Caution: whenever add a new state which could run into IDLE, 
+//			 you should add a specific exit for this state.		
+		STATE_IDLE: 
+			if ( cmd == CMD_SHIFT)
+				next_state	=	STATE_SHIFT;
+			else if ( cmd == CMD_LOAD )
+				next_state	=	STATE_LOAD;
+			else if ( cmd == CMD_PRELOAD)
+				next_state	=	STATE_PRELOAD;
+			else
+				next_state	=	STATE_IDLE;
 		
 		default: 
 			next_state	=	current_state;
 	endcase
 end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		preload_cycle		<=	0;	
+	else begin
+		case (current_state)
+		
+			STATE_INIT: 
+				preload_cycle	<=	0;
+						
+			STATE_PRELOAD: 
+//			if (buffer_col_idx == BUFFER_COL - 1)	
+				if (lastCol)	
+					if ( lastPreloadCycle )
+						preload_cycle	<=	preload_cycle;
+					else
+						preload_cycle	<=	preload_cycle + 1'b1;
+				else
+					preload_cycle	<=	preload_cycle;
+						
+			STATE_SHIFT: 
+				preload_cycle	<=	0;			
+			
+			STATE_BIAS: 
+				preload_cycle	<=	0;
+			
+			STATE_LOAD: 
+				preload_cycle	<=	0;
+			
+			STATE_IDLE: 
+				preload_cycle	<=	0;
+				
+			default: 
+				preload_cycle	<=	preload_cycle;
+	
+		endcase
+	end
+end	
+
 
 
 //	-- ack
@@ -130,9 +197,20 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
-				ack		<=	ACK_IDLE;
-												
+			STATE_INIT: 
+				ack	<=	ACK_IDLE;
+						
+			STATE_PRELOAD: 
+//				if (buffer_col_idx == BUFFER_COL - 1)	
+//					if ( preload_cycle == BUFFER_ROW - 1)
+				if (lastCol)	
+					if ( lastPreloadCycle )
+						ack	<=	ACK_PRELOAD_FIN;
+					else
+						ack	<=	ACK_IDLE;
+				else
+					ack	<=	ACK_IDLE;
+						
 			STATE_SHIFT: 
 				ack		<=	ACK_IDLE;			
 			
@@ -140,11 +218,15 @@ always @(posedge clk, negedge rst_n) begin
 				ack		<=	ACK_SHIFT_FIN;
 			
 			STATE_LOAD: 
+//				if (buffer_col_idx == BUFFER_COL - 1 )
 				if ( lastCol )
 					ack		<=	ACK_LOAD_FIN;
 				else
 					ack		<=	ACK_IDLE;
 			
+			STATE_IDLE: 
+				ack		<=	ACK_IDLE;
+				
 			default: 
 				ack		<=	ACK_IDLE;
 	
@@ -159,8 +241,14 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
-				ext_rom_addr	<=	ext_rom_addr;
+			STATE_INIT: 
+				ext_rom_addr	<=	0;
+			
+			STATE_PRELOAD: 
+				if (buffer_col_idx < BUFFER_COL)
+					ext_rom_addr	<=	ext_rom_addr + 1'b1;
+				else
+					ext_rom_addr	<=	ext_rom_addr;
 			
 			STATE_SHIFT: 
 				ext_rom_addr	<=	ext_rom_addr;
@@ -171,7 +259,8 @@ always @(posedge clk, negedge rst_n) begin
 			STATE_LOAD: 
 				ext_rom_addr	<=	ext_rom_addr + 1'b1;
 				
-	
+			STATE_IDLE: 
+				ext_rom_addr	<=	ext_rom_addr;	
 				
 			default: 
 				ext_rom_addr	<=	ext_rom_addr;
@@ -187,13 +276,24 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
+			STATE_INIT: 
 				buffer_col_idx	<=	0;
-
-			STATE_SHIFT, STATE_BIAS: 
+			
+			STATE_PRELOAD: 
+//				if (buffer_col_idx == BUFFER_COL - 1 && preload_cycle == BUFFER_ROW - 1)
+				if (lastCol && lastPreloadCycle)
+					buffer_col_idx	<=	0;
+				else if (buffer_col_idx == BUFFER_COL)
+					buffer_col_idx	<=	0;
+				else
+					buffer_col_idx	<=	buffer_col_idx + 1'b1;
+			
+			STATE_SHIFT, STATE_BIAS, STATE_IDLE: 
 				buffer_col_idx	<=	buffer_col_idx;					
-												
+						
+						
 			STATE_LOAD: 
+//				if (buffer_col_idx == BUFFER_COL - 1)
 				if (lastCol)					
 					buffer_col_idx	<=	0;
 				else
@@ -212,10 +312,14 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
+			STATE_INIT: 
+				shift_idx	<=	0;
+			
+			STATE_PRELOAD: 
 				shift_idx	<=	0;
 			
 			STATE_SHIFT: 
+//				if (shift_idx == BUFFER_ROW - 1)
 				if (lastShift)
 					shift_idx	<=	0;
 				else
@@ -227,7 +331,9 @@ always @(posedge clk, negedge rst_n) begin
 			STATE_LOAD: 
 				shift_idx	<=	shift_idx;
 			
-			
+			STATE_IDLE: 
+				shift_idx	<=	shift_idx;			
+		
 			default:
 				shift_idx	<=	shift_idx;
 		endcase
@@ -245,9 +351,12 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
+			STATE_INIT: 
 				data_out_reg 	<=	{IMAGE_SIZE {`DATA_WIDTH 'h0}};
-
+					
+			STATE_PRELOAD: 
+				data_out_reg 	<=	{IMAGE_SIZE {`DATA_WIDTH 'h0}};
+				
 			STATE_SHIFT: 
 				if (shift_idx == 0) 
 					data_out_reg	<=	data_from_buffer;																		
@@ -259,7 +368,10 @@ always @(posedge clk, negedge rst_n) begin
 														
 			STATE_LOAD: 
 				data_out_reg 	<=	{IMAGE_SIZE {`DATA_WIDTH 'h0}};
-																																											
+												
+			STATE_IDLE: 
+				data_out_reg 	<=	{IMAGE_SIZE {`DATA_WIDTH 'h0}};
+																															
 			default: 
 				data_out_reg	<=	data_out_reg;				
 		endcase
@@ -272,10 +384,14 @@ always @(posedge clk, negedge rst_n) begin
 	else begin
 		case (current_state)
 			
-			STATE_IDLE: 
+			STATE_INIT: 
+				buffer_row_idx <=	0;
+						
+			STATE_PRELOAD: 
 				buffer_row_idx <=	0;
 						
 			STATE_SHIFT: 
+//				if( shift_idx == BUFFER_ROW - 1 )
 				if ( lastShift )
 					buffer_row_idx	<=	buffer_row_idx + 1'd1;	
 				else
@@ -286,6 +402,9 @@ always @(posedge clk, negedge rst_n) begin
 														
 			STATE_LOAD: 
 				buffer_row_idx <=	0;												
+
+			STATE_IDLE: 
+				buffer_row_idx <=	buffer_row_idx;
 				
 			default: 
 				buffer_row_idx <=	buffer_row_idx;				
@@ -322,9 +441,17 @@ conv_weight_buffer U_conv_weight_buffer_0(
 always	@(current_state, preload_cycle) begin
 	case (current_state)
 			
-			// STATE_INIT: 
-				// $display("[%8t ]: Interface initializing.",$time);
-									
+			STATE_INIT: begin
+				$display("[%8t ]: Interface initializing.",$time);
+			end
+			
+			STATE_PRELOAD: begin
+				if(preload_cycle == 2'd0)
+					$display("[%8t ]: Now the buffer will drop all the previous data and refresh to new data.",$time);	
+				else
+					$display("[%8t ]: Complete loading array [ %2d ].",$time, preload_cycle - 1);
+			end
+			
 			STATE_SHIFT: 
 				$display("[%8t ]: Begin to load one data from one row of the buffer and shift the convolution window.",$time);
 									

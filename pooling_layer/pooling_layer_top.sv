@@ -7,7 +7,7 @@ module	pooling_layer_top(
 //--input
 	clk,
 	rst_n,	
-	valid,
+	input_valid,
 	feature_idx,
 	feature_row,
 	data_in,	
@@ -19,10 +19,10 @@ module	pooling_layer_top(
 
 input	clk;
 input	rst_n;
-input	valid;
+input	input_valid;
 
-input	[1:0]	feature_idx;
-input	[2:0]	feature_row;
+input	[FEATURE_WIDTH-1:0]	feature_idx;
+input	[ROW_WIDTH-1:0]	feature_row;
 
 input	[INPUT_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
 output	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_out;	//	3
@@ -35,40 +35,37 @@ wire	[`DATA_WIDTH-1:0]	data_from_array_0;
 wire	[`DATA_WIDTH-1:0]	data_from_output_interface_0;
 
 
-wire	valid;
-wire	pooling_valid;
+wire	input_valid;
+wire	output_valid;
 
-reg		[2:0]	block_idx;
+reg		[ROW_WIDTH-1:0]	feature_idx_delay_0;
+reg		[ROW_WIDTH-1:0]	feature_row_delay_0;
+
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		block_idx	<=	3'b0;
-	else if(valid)
-		block_idx	<=	feature_idx;
+		feature_idx_delay_0	<=	0;
+	else if(input_valid)
+		feature_idx_delay_0	<=	feature_idx;
 	else
-		block_idx	<=	block_idx;
+		feature_idx_delay_0	<=	feature_idx_delay_0;
 end
 
-
-//---------------------------------------------
-reg	[2:0]	feature_row_delay_0;
-
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		feature_row_delay_0	<=	3'b0;
-	else if(valid)
+		feature_row_delay_0	<=	0;
+	else if(input_valid)
 		feature_row_delay_0	<=	feature_row;
 	else
 		feature_row_delay_0	<=	feature_row_delay_0;
 end
 
-//-----------------------------------------------
 
 pooling_input_interface U_pooling_input_interface_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.valid	(valid),
+	.input_valid		(input_valid),
 	.data_in			(data_in[INPUT_SIZE*`DATA_WIDTH-1 -: KERNEL_SIZE*`DATA_WIDTH]),		
 //--.output
 	.data_out			(data_from_cache_0)
@@ -81,12 +78,12 @@ pooling_array U_pooling_array_0(
 	.rst_n		(rst_n),
 	.data_in	(data_from_cache_0),
 	
-	.kernel_calc_fin		(valid),
-	.feature_idx(block_idx),
+	.input_valid(input_valid),
+	.feature_idx(feature_idx_delay_0),
 	.feature_row(feature_row_delay_0),
 //--output
-	.valid		(pooling_valid),
-	.data_out	(data_from_array_0)	
+	.output_valid(output_valid),
+	.data_out	 (data_from_array_0)	
 );
 
 
@@ -96,10 +93,10 @@ pooling_output_interface U_pooling_output_interface_0(
 //--input
 	.clk		(clk),
 	.rst_n		(rst_n),
-	.feature_idx(block_idx),
+	.feature_idx(feature_idx_delay_0),
 	.feature_row(feature_row_delay_0),
 	.data_in	(data_from_array_0),
-	.valid		(pooling_valid),
+	.input_valid(output_valid),
 //--output
 	.data_out	(data_from_output_interface_0)
 );

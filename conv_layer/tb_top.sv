@@ -28,6 +28,8 @@ bit		[1:0]	feature_idx;
 bit		[2:0]	feature_row;
 bit				image_calc_fin;
 
+bit				layer_0_en;
+
 assign {feature_output_0_0,
         feature_output_0_1,
         feature_output_0_2,
@@ -48,23 +50,25 @@ initial begin
 	rst_n		=	1;
 	#10
 	enable		=	1;
+	#10
+	enable		=	0;
 	
 	// #400
 	// idle		=	1;
 	// #100
 	// idle		=	0;
-	#15000
+	#20000
 	$stop;
 end	
 	
-image_manager U_image_manager(
+network_manager U_network_manager(
 //--input
 	.clk(clk),
 	.rst_n(rst_n),
-	.enable(enable),
-//--output
+	.start(enable),
 	.layer_0_calc_fin(image_calc_fin),
-	
+//--output
+	.layer_0_en(layer_0_en),	
 	.data_out()
 );
 
@@ -73,12 +77,12 @@ conv_layer_top U_conv_layer_top_0(
 // --input
 	.clk 			(clk),
 	.rst_n			(rst_n),
-	.enable			(enable),
+	.enable			(layer_0_en),
 	.data_in		(pixel_in),
 
 // --output
 	.ext_rom_addr		(ext_rom_addr),
-	.valid	(valid),
+	.valid				(valid),
 	.image_calc_fin		(image_calc_fin),
 	.feature_idx		(feature_idx),
 	.feature_row		(feature_row),
@@ -86,21 +90,12 @@ conv_layer_top U_conv_layer_top_0(
 	
 );
 
-/* pooling_layer_input_cache U_pooling_layer_input_cache_0(
-//--input
-	.clk				(clk),
-	.rst_n				(rst_n),
-	.valid	(valid),
-	.data_in			(feature_output),		
-//--.output
-	.data_out			()
-); */
 
 pooling_layer_top U_pooling_layer_top_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
-	.valid				(valid),
+	.input_valid		(valid),
 	.data_in			(feature_output),
 	.feature_idx		(feature_idx),
 	.feature_row		(feature_row),

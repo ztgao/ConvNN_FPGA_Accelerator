@@ -13,12 +13,15 @@ module conv_layer_controller(
 	//--output
 	
 	input_interface_cmd,
+//	kernel_array_clear,	
 	valid,
 	
 	image_calc_fin,
 	
 	feature_idx,
 	feature_row
+//	kernel_array_cmd,
+//	output_inteface_cmd,
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
@@ -32,71 +35,57 @@ input	[1:0]			input_interface_ack;
 output 	[1:0]			input_interface_cmd;
 reg		[1:0]			input_interface_cmd;
 
-reg		[WEIGHT_WIDTH-1:0]			weight_idx;
-reg		[ARRAY_WIDTH-1:0]			row_idx;
+reg		[1:0]			weight_idx;
+reg		[2:0]			row_idx;
 
 reg		[2:0]			current_state;
 reg		[2:0]			next_state;
 
+//output reg				kernel_array_clear;
 output reg				valid;
 
 output reg				image_calc_fin;
 
-output reg	[WEIGHT_WIDTH-1:0]		feature_idx;
-output reg	[ARRAY_WIDTH-1:0]		feature_row;
-
-reg		[BUFFER_ROW_WIDTH:0] 		preload_cycle;
-
-wire		lastPreloadCycle;
-wire		lastWeight;
-wire		lastRow;
-
-assign		lastPreloadCycle 	= 	(preload_cycle == KERNEL_SIZE -1);
-assign		lastWeight			=	(weight_idx == TOTAL_WEIGHT - 1);
-assign		lastRow				=	(row_idx  == ARRAY_SIZE - 1);
+output reg	[1:0]		feature_idx;
+output reg	[2:0]		feature_row;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
-		current_state	<=	STATE_IDLE;
+		current_state	<=	STATE_INIT;
 	else begin
 		if (enable)
 			current_state	<=	next_state;
 		else
-			current_state	<= 	STATE_IDLE;
+			current_state	<= 	current_state;
 	end
 end
 
 always @(current_state, input_interface_ack, weight_idx) begin
 	case (current_state)
-		STATE_IDLE: 
-			if(enable)
-				next_state	=	STATE_PRELOAD;
-			else
-				next_state	=	STATE_IDLE;
+		STATE_INIT: 
+			next_state	=	STATE_PRELOAD;
 		
 		STATE_PRELOAD: 
-			if ( input_interface_ack == ACK_LOAD_FIN )
-				if ( lastPreloadCycle )
-					next_state	=	STATE_SHIFT;
-				else
-					next_state	=	STATE_PRELOAD;	
+			if ( input_interface_ack == ACK_PRELOAD_FIN )
+				next_state	=	STATE_SHIFT;
 			else
 				next_state	=	STATE_PRELOAD;
 		
 		STATE_SHIFT: begin
-			if ( input_interface_ack == ACK_SHIFT_FIN ) 
-				if ( lastWeight  ) 
-					if ( lastRow )
+			if ( input_interface_ack == ACK_SHIFT_FIN ) begin
+				if ( weight_idx == TOTAL_WEIGHT - 1  ) begin
+					if ( row_idx  == TOTAL_ROW - 1 )
 						next_state	<=	STATE_PRELOAD;
 					else
-						next_state	=	STATE_LOAD;				
+						next_state	=	STATE_LOAD;
+				end
 				else
-					next_state	=	STATE_SHIFT;			
+					next_state	=	STATE_SHIFT;
+			end
 			else
 				next_state	= STATE_SHIFT;
 		end
 		
-			
 		STATE_LOAD: 
 			if (input_interface_ack	==	ACK_LOAD_FIN)
 				next_state	=	STATE_SHIFT;
@@ -108,36 +97,6 @@ always @(current_state, input_interface_ack, weight_idx) begin
 	endcase		
 end
 
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) 
-		preload_cycle		<=	0;	
-	else begin
-		case (current_state)
-		
-			STATE_IDLE: 
-				preload_cycle	<=	0;
-						
-			STATE_PRELOAD: 
-				if (input_interface_ack == ACK_LOAD_FIN)
-					if (lastPreloadCycle)
-						preload_cycle	<=	0;
-					else
-						preload_cycle	<=	preload_cycle + 1'b1;
-				else
-					preload_cycle	<=	preload_cycle;
-						
-			STATE_SHIFT: 
-				preload_cycle	<=	0;			
-
-			STATE_LOAD: 
-				preload_cycle	<=	0;
-			
-			default: 
-				preload_cycle	<=	preload_cycle;
-	
-		endcase
-	end
-end
 
 
 always @(posedge clk, negedge rst_n) begin
@@ -145,30 +104,29 @@ always @(posedge clk, negedge rst_n) begin
 		input_interface_cmd	<=	CMD_IDLE;
 	else begin
 		case (current_state)
-			
-			STATE_IDLE:
+			STATE_INIT:
 				if (enable)
-					input_interface_cmd <=	CMD_LOAD;
+					input_interface_cmd <=	CMD_PRELOAD;
 				else
 					input_interface_cmd	<=	CMD_IDLE;
 				
-			
 			STATE_PRELOAD:
-				if ( input_interface_ack == ACK_LOAD_FIN )
-					if ( lastPreloadCycle )
-						input_interface_cmd	=	CMD_SHIFT;
-					else
-						input_interface_cmd	=	CMD_LOAD;	
+				if ( input_interface_ack == ACK_PRELOAD_FIN )
+					input_interface_cmd	<=	CMD_SHIFT;
 				else
-					input_interface_cmd	=	CMD_IDLE;
-
-			
+					input_interface_cmd	<=	CMD_IDLE;
+					
 			STATE_SHIFT:
-				if ( input_interface_ack == ACK_SHIFT_FIN) 
-					if ( lastWeight ) 
-						input_interface_cmd	<=	CMD_LOAD;					
+				if ( input_interface_ack == ACK_SHIFT_FIN) begin
+					if ( weight_idx == TOTAL_WEIGHT - 1 ) begin
+						if ( row_idx  == TOTAL_ROW - 1 )
+							input_interface_cmd	<=	CMD_PRELOAD;
+						else
+							input_interface_cmd	<=	CMD_LOAD;
+					end	
 					else
 						input_interface_cmd	<=	CMD_SHIFT;
+				end
 				else
 					input_interface_cmd	<= CMD_IDLE;
 			
@@ -188,24 +146,24 @@ end
 //	--	
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
-		weight_idx	<=	0;
-	else if ( input_interface_ack == ACK_SHIFT_FIN)
-		if ( lastWeight )
-			weight_idx	<=	0;
+		weight_idx	<=	2'd0;
+	else if ( input_interface_ack == ACK_SHIFT_FIN) begin
+		if ( weight_idx == TOTAL_WEIGHT - 1 )
+			weight_idx	<=	2'd0;
 		else
-			weight_idx	<=	weight_idx	+ 1'd1; 
+			weight_idx	<=	weight_idx	+ 1'd1;
+	end 
 	else
 		weight_idx	<=	weight_idx;	
 end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 	
-		row_idx		<=	0;
-	else if (input_interface_ack == ACK_SHIFT_FIN && lastWeight) 
-		if ( lastRow )
-			row_idx		<=	0;
-		else
-			row_idx		<=	row_idx	+ 1'b1;	 
+		row_idx		<=	3'd0;
+	else if (input_interface_ack == ACK_SHIFT_FIN && weight_idx == TOTAL_WEIGHT - 1) 
+		row_idx		<=	row_idx	+ 1'b1;	
+	else if ( row_idx == TOTAL_ROW)
+		row_idx		<=	3'd0;
 	else
 		row_idx	<=	row_idx;
 end
@@ -237,24 +195,34 @@ end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		feature_idx	<=	0;
+		feature_idx	<=	2'd0;
 	else if(valid)
 		feature_idx	<=	weight_idx;
 	else
 		feature_idx	<=	feature_idx;
 end	
 
+
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		feature_row	<=	0;
+		feature_row	<=	2'd0;
 	else if(valid)
 		feature_row	<=	row_idx;
 	else
 		feature_row	<=	feature_row;
 end
 
+// always @(posedge clk, negedge rst_n) begin
+	// if(!rst_n) 
+		// image_calc_fin	<=	0;
+	// else if(valid && feature_idx == TOTAL_WEIGHT-1 && feature_row = TOTAL_ROW- 1)
+		// image_calc_fin	<=	1;
+	// else
+		// image_calc_fin	<=	0;
+// end	
+
 always @(*)	begin
-	if(valid && feature_idx == TOTAL_WEIGHT-1 && feature_row == ARRAY_SIZE- 1)
+	if(valid && feature_idx == TOTAL_WEIGHT-1 && feature_row == TOTAL_ROW- 1)
 		image_calc_fin	=	1;
 	else
 		image_calc_fin	=	0;
