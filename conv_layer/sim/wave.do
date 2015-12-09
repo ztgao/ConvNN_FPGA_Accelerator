@@ -103,7 +103,7 @@ add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/shift_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/buffer_col_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/buffer_row_idx
-add wave -noupdate /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/preload_cycle
+add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/preload_cycle
 add wave -noupdate -divider {pooling top}
 add wave -noupdate /tb_top/U_pooling_layer_top_0/clk
 add wave -noupdate /tb_top/U_pooling_layer_top_0/rst_n
@@ -129,14 +129,17 @@ add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/prev_result_o
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/result_ob
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_out_ob
 add wave -noupdate -divider pooling_out_itf
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/clk
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rst_n
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid_delay_0
 add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_idx
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_in
-add wave -noupdate /tb_top/U_pooling_layer_top_0/output_valid
-add wave -noupdate -expand /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/buffer_ob
+add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_row
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_in_ob
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_out_ob
 add wave -noupdate -divider {New Divider}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3265 ns} 0}
+WaveRestoreCursors {{Cursor 1} {625 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 51
@@ -152,4 +155,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ns} {42084 ns}
+WaveRestoreZoom {0 ns} {2640 ns}

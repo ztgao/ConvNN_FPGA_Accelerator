@@ -20,7 +20,7 @@ input	clk;
 input	rst_n;
 input	input_valid;
 
-input	[2:0]	block_idx;
+input	[ROW_WIDTH-1:0]	block_idx;
 
 
 
@@ -38,19 +38,6 @@ reg			[`DATA_WIDTH-1:0]	buffer_0 [0:KERNEL_SIZE-1];		//	2[3] 32x2
 
 //reg			[3:0]
 
-
-// always @(posedge clk, negedge rst_n) begin
-	// if(!rst_n) begin
-		// {buffer_0[0],buffer_0[1],buffer_0[2],buffer_0[3]}	<=	KERNEL_SIZE*KERNEL_SIZE*`DATA_WIDTH 'h0;
-	// end	
-	// else if (input_valid) begin
-		// {buffer_0[0],buffer_0[1]}	<=	data_in;
-	// end
-	// else begin
-		// buffer_0[0]	<=	buffer_0[1];
-		// buffer_0[1]	<=  `DATA_WIDTH 'b0;
-	// end
-// end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin

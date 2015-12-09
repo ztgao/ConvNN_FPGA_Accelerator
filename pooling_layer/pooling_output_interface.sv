@@ -20,8 +20,8 @@ module	pooling_output_interface(
 
 input		clk;
 input		rst_n;
-input	[1:0]	feature_idx;
-input	[2:0]	feature_row;
+input	[FEATURE_WIDTH-1:0]	feature_idx;
+input	[ROW_WIDTH-1:0]	feature_row;
 input 		input_valid;
 
 input		[`DATA_WIDTH-1:0]	data_in;	
@@ -38,7 +38,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 	else if (input_valid) begin
 		case(feature_row)
-			3'd1, 3'd3, 3'd5: begin
+			1, 3, 5: begin
 				case (feature_idx)
 					2'd0:	buffer[0]	<=	data_in;
 					2'd1:	buffer[1]	<=	data_in;
@@ -78,7 +78,7 @@ always @(posedge clk, negedge rst_n) begin
 		data_out	<=	`DATA_WIDTH 'b0;
 	else if (input_valid_delay_0) begin
 		case(feature_row)
-			3'd1, 3'd3, 3'd5: begin
+			1, 3, 5: begin
 				case(feature_idx)
 					2'd0: data_out	<=	buffer[0];
 					2'd1: data_out	<=	buffer[1];
@@ -97,6 +97,11 @@ end
 			
 
 `ifdef DEBUG
+
+shortreal data_in_ob;
+always @(*) begin
+	 data_in_ob	=	$bitstoshortreal(data_in);
+end
 
 shortreal buffer_ob[TOTAL_FEATURE];
 always @(*) begin

@@ -33,10 +33,10 @@ wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
 output	[`EXT_ADDR_WIDTH-1:0]			ext_rom_addr;
 
 output									image_calc_fin;
-output	[1:0]							feature_idx;
+output	[WEIGHT_WIDTH-1:0]							feature_idx;
 //	register connected to covolution kernel
 
-output	[2:0]							feature_row;
+output	[ARRAY_WIDTH-1:0]							feature_row;
 
 reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
 wire	[`DATA_WIDTH-1:0]				i_weight;
@@ -46,8 +46,6 @@ output						valid;
 
 wire	[1:0]				input_interface_cmd;
 wire	[1:0]				input_interface_ack;
-output	[1:0]				feature_idx;
-
 
 wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature;
 

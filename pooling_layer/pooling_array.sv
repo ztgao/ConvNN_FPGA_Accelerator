@@ -26,8 +26,8 @@ input	clk;
 input	rst_n;
 //input	clear;
 
-input	[1:0]	feature_idx;
-input	[2:0]	feature_row;
+input	[FEATURE_WIDTH-1:0]	feature_idx;
+input	[ROW_WIDTH-1:0]	feature_row;
 
 input	input_valid;
 
@@ -51,6 +51,12 @@ reg		[1:0]	cmp_idx;
 reg		[1:0]	current_state;
 reg		[1:0]	next_state;
 
+wire	lastCmp;
+wire	lastFeature;
+
+assign	lastCmp	=	(cmp_idx == KERNEL_SIZE); // (KERNEL_SIZE - 1) + 1 extra previous result
+assign	lastFeature	=	(feature_idx == TOTAL_FEATURE - 1);
+
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
 		current_state	<=	STATE_IDLE;
@@ -68,7 +74,7 @@ always @(*) begin
 				next_state	=	STATE_IDLE;
 		
 		STATE_CMP:
-			if(cmp_idx == 2'd2)
+			if (lastCmp)
 				next_state	=	STATE_IDLE;
 			else
 				next_state	=	STATE_CMP;
@@ -89,7 +95,7 @@ always @(posedge clk, negedge rst_n) begin
 				cmp_idx	<=	2'd0;
 			
 			STATE_CMP:
-				if(cmp_idx == 2'd2)
+				if(lastCmp)
 					cmp_idx	<=	2'd0;
 				else
 					cmp_idx	<=	cmp_idx + 1'd1;
@@ -103,7 +109,7 @@ end
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		output_valid	<=	0;
-	else if (cmp_idx == 2'd2)
+	else if (lastCmp)
 		output_valid	<=	1;
 	else
 		output_valid	<=	0;
@@ -113,9 +119,9 @@ end
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		clear_prev_result	<=	0;
-	else if (output_valid && feature_idx == TOTAL_FEATURE - 1) 
+	else if (output_valid && lastFeature) 
 		case (feature_row)
-			3'd1, 3'd3,3'd5:
+			1, 3, 5:
 				clear_prev_result	<=	1;
 			default:
 				clear_prev_result	<=	0;
@@ -156,7 +162,7 @@ always @(posedge clk, negedge rst_n) begin
 end	
 
 always @(*) begin
-	if (cmp_idx == 2'd2)
+	if (lastCmp)
 		case (feature_idx)
 			2'd0: data_in_reg =	prev_result[0];
 			2'd1: data_in_reg =	prev_result[1];
