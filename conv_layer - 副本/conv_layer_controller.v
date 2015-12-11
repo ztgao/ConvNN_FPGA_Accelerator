@@ -70,7 +70,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-always @(*) begin
+always @(current_state, input_interface_ack, weight_idx) begin
 	case (current_state)
 		STATE_IDLE: 
 			if(enable)

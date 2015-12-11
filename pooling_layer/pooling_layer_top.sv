@@ -3,7 +3,15 @@
 
 `include "../../global_define.v"
 
-module	pooling_layer_top(
+module	pooling_layer_top #(
+	parameter
+	INPUT_SIZE		=	6,
+	KERNEL_SIZE		=	2,
+	OUTPUT_SIZE		=	3,
+	TOTAL_FEATURE	=	4,
+	FEATURE_WIDTH	=	2,
+	ROW_WIDTH		=	3)
+(
 //--input
 	clk,
 	rst_n,	
@@ -61,7 +69,11 @@ always @(posedge clk, negedge rst_n) begin
 end
 
 
-pooling_input_interface U_pooling_input_interface_0(
+pooling_input_interface #(
+	.KERNEL_SIZE		(KERNEL_SIZE),
+	.ROW_WIDTH			(ROW_WIDTH)
+)
+U_pooling_input_interface_0(
 //--input
 	.clk				(clk),
 	.rst_n				(rst_n),
@@ -72,7 +84,13 @@ pooling_input_interface U_pooling_input_interface_0(
 );
 
 
-pooling_array U_pooling_array_0(
+pooling_array #(
+	.KERNEL_SIZE		(KERNEL_SIZE),		
+	.TOTAL_FEATURE	    (TOTAL_FEATURE),
+	.FEATURE_WIDTH	    (FEATURE_WIDTH),
+	.ROW_WIDTH		    (ROW_WIDTH)
+)
+U_pooling_array_0(
 //--input
 	.clk		(clk),
 	.rst_n		(rst_n),
@@ -87,9 +105,13 @@ pooling_array U_pooling_array_0(
 );
 
 
-
-
-pooling_output_interface U_pooling_output_interface_0(
+pooling_output_interface #(
+	.KERNEL_SIZE		(KERNEL_SIZE),
+	.FEATURE_WIDTH		(FEATURE_WIDTH),	
+	.TOTAL_FEATURE	    (TOTAL_FEATURE),
+	.ROW_WIDTH		    (ROW_WIDTH)
+)
+U_pooling_output_interface_0(
 //--input
 	.clk		(clk),
 	.rst_n		(rst_n),

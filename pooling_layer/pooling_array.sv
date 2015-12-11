@@ -3,12 +3,17 @@
 
 `include "../../global_define.v"
 
-module	pooling_array(
+module	pooling_array #(
+	parameter
+	KERNEL_SIZE		=	2,	
+	TOTAL_FEATURE	=	4,
+	FEATURE_WIDTH	=	2,
+	ROW_WIDTH		=	3)
+(
 //--input
 	clk,
 	rst_n,
 	data_in,
-//	clear,
 	feature_idx,
 	feature_row,
 	input_valid,
@@ -19,12 +24,15 @@ module	pooling_array(
 
 `include "../../pooling_layer/pooling_param.v"
 
-parameter	STATE_IDLE	=	2'd0;
-parameter	STATE_CMP	=	2'd1;
+
+localparam	STATE_IDLE	=	2'd0;
+localparam	STATE_CMP	=	2'd1;
+
+localparam	CMP_CYCLE	=	KERNEL_SIZE + 1;
+localparam	CMP_WIDTH	=	logb2(CMP_CYCLE);
 
 input	clk;
 input	rst_n;
-//input	clear;
 
 input	[FEATURE_WIDTH-1:0]	feature_idx;
 input	[ROW_WIDTH-1:0]	feature_row;
@@ -44,9 +52,9 @@ reg		[`DATA_WIDTH-1:0]	data_in_reg;
 
 wire	[`DATA_WIDTH-1:0]	result;
 
-reg		clear_prev_result;
+reg		clrPrevResult;
 
-reg		[1:0]	cmp_idx;
+reg		[CMP_WIDTH-1:0]	cmp_idx;
 
 reg		[1:0]	current_state;
 reg		[1:0]	next_state;
@@ -54,7 +62,7 @@ reg		[1:0]	next_state;
 wire	lastCmp;
 wire	lastFeature;
 
-assign	lastCmp	=	(cmp_idx == KERNEL_SIZE); // (KERNEL_SIZE - 1) + 1 extra previous result
+assign	lastCmp		=	(cmp_idx == KERNEL_SIZE); // (KERNEL_SIZE - 1) + 1 extra previous result
 assign	lastFeature	=	(feature_idx == TOTAL_FEATURE - 1);
 
 always @(posedge clk, negedge rst_n) begin
@@ -87,16 +95,16 @@ end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		cmp_idx	<=	2'd0;
+		cmp_idx	<=	'd0;
 	else
 		case (current_state)
 			
 			STATE_IDLE:
-				cmp_idx	<=	2'd0;
+				cmp_idx	<=	'd0;
 			
 			STATE_CMP:
 				if(lastCmp)
-					cmp_idx	<=	2'd0;
+					cmp_idx	<=	'd0;
 				else
 					cmp_idx	<=	cmp_idx + 1'd1;
 									
@@ -118,19 +126,45 @@ end
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		clear_prev_result	<=	0;
+		clrPrevResult	<=	0;
 	else if (output_valid && lastFeature) 
 		case (feature_row)
 			1, 3, 5:
-				clear_prev_result	<=	1;
+				clrPrevResult	<=	1;
 			default:
-				clear_prev_result	<=	0;
+				clrPrevResult	<=	0;
 		endcase	
 	else
-		clear_prev_result	<=	0;		
+		clrPrevResult	<=	0;		
 end
 
-always @(posedge clk, negedge rst_n) begin
+genvar	gv_prevResIdx;	
+
+generate
+	for (gv_prevResIdx = 0; gv_prevResIdx < TOTAL_FEATURE; gv_prevResIdx=gv_prevResIdx+1)
+	begin: genPrevRes
+	////////////////////////////////////////////
+		always @(posedge clk, negedge rst_n) begin
+			if(!rst_n) 
+				prev_result[gv_prevResIdx]	<=	`DATA_WIDTH 'b0;	
+			
+			else if (output_valid) 
+				case (feature_idx)		
+					gv_prevResIdx: prev_result[gv_prevResIdx]	<=	result;
+					default:
+						prev_result[gv_prevResIdx]	<=	prev_result[gv_prevResIdx];
+				endcase	
+			
+			else if (clrPrevResult) 
+				prev_result[gv_prevResIdx]	<=	`DATA_WIDTH 'b0;						
+			else 
+				prev_result[gv_prevResIdx]	<=	prev_result[gv_prevResIdx];
+		end	
+	////////////////////////////////////////////
+	end
+endgenerate		
+			
+/* always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) begin
 		prev_result[0]	<=	`DATA_WIDTH 'b0;
 		prev_result[1]	<=  `DATA_WIDTH 'b0;
@@ -139,14 +173,11 @@ always @(posedge clk, negedge rst_n) begin
 	end	
 	
 	else if (output_valid) 
-		case (feature_idx)
-			2'd0: prev_result[0]	<= 	result;
-			2'd1: prev_result[1]	<= 	result;
-			2'd2: prev_result[2]	<= 	result;
-			2'd3: prev_result[3]	<= 	result;
+		case (feature_idx)		
+			feature_idx: prev_result[feature_idx]	<=	result;				
 		endcase	
 	
-	else if (clear_prev_result) begin
+	else if (clrPrevResult) begin
 		prev_result[0]	<=	`DATA_WIDTH 'b0;
 		prev_result[1]	<=  `DATA_WIDTH 'b0;
 		prev_result[2]	<=  `DATA_WIDTH 'b0;
@@ -159,15 +190,12 @@ always @(posedge clk, negedge rst_n) begin
 		prev_result[2]	<=  prev_result[2];
 		prev_result[3]	<=  prev_result[3];
 	end
-end	
-
+end	 */		
+						
 always @(*) begin
 	if (lastCmp)
 		case (feature_idx)
-			2'd0: data_in_reg =	prev_result[0];
-			2'd1: data_in_reg =	prev_result[1];
-			2'd2: data_in_reg =	prev_result[2];
-			2'd3: data_in_reg =	prev_result[3];
+			feature_idx: data_in_reg =	prev_result[feature_idx];
 		endcase
 	else
 		data_in_reg	= data_in;
@@ -190,10 +218,9 @@ pooling_max_cell U_pooling_max_cell_0(
 
 shortreal prev_result_ob[TOTAL_FEATURE];
 always @(*) begin
-	 prev_result_ob[0]	=	$bitstoshortreal(prev_result[0]);
-	 prev_result_ob[1]	=	$bitstoshortreal(prev_result[1]);
-	 prev_result_ob[2]	=	$bitstoshortreal(prev_result[2]);
-	 prev_result_ob[3]	=	$bitstoshortreal(prev_result[3]);
+	for (int i = 0; i < TOTAL_FEATURE; i=i+1) begin
+		prev_result_ob[i]	=	$bitstoshortreal(prev_result[i]);
+	end
 end
 
 shortreal data_in_reg_ob;

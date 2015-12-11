@@ -22,12 +22,3 @@ parameter	CMD_IDLE			=	2'd0;
 parameter	CMD_PRELOAD			=	2'd1;
 parameter	CMD_SHIFT			=	2'd2;
 parameter	CMD_LOAD			=	2'd3;
-
-function integer logb2;
-    input integer n;
-	begin
-		n = n-1;
-		for(logb2=0; n>0; logb2=logb2 + 1)
-			n = n>>1;
-    end
-endfunction

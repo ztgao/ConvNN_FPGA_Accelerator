@@ -1,5 +1,6 @@
 onerror {resume}
-virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
+virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
 virtual type { \
 INIT\
 PRELOAD\
@@ -8,8 +9,7 @@ SHIFT\
 {0x6 LOAD}\
 {0x7 IDLE}\
 } FSM_TYPE
-virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
-virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (ACK_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack
@@ -31,18 +31,26 @@ add wave -noupdate /tb_top/U_conv_layer_top_0/enable
 add wave -noupdate -radix unsigned /tb_top/feature_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/feature_row
 add wave -noupdate -divider type_cast
-add wave -noupdate -expand /tb_top/U_conv_layer_top_0/o_pixel_bus_ob
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_0
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_1
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_2
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_3
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_4
+add wave -noupdate -expand -group o_pixel_bus /tb_top/U_conv_layer_top_0/o_pixel_bus_observe_5
 add wave -noupdate -divider <NULL>
 add wave -noupdate /tb_top/U_conv_layer_top_0/i_weight_observe
 add wave -noupdate -divider <NULL>
-add wave -noupdate -expand /tb_top/U_conv_layer_top_0/feature_ob
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_0
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_1
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_2
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_3
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_4
+add wave -noupdate -expand -group feature_ob /tb_top/U_conv_layer_top_0/feature_observe_5
 add wave -noupdate -divider conv_top
 add wave -noupdate -divider Controller
 add wave -noupdate -expand -group ctrl /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/ctrl_cstate
 add wave -noupdate -expand -group ctrl /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/intf_ack
 add wave -noupdate -expand -group ctrl /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/intf_cmd
-add wave -noupdate -expand -group ctrl -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/next_state
-add wave -noupdate -expand -group ctrl -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/preload_cycle
 add wave -noupdate -expand -group ctrl -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/preload_cycle
 add wave -noupdate -expand -group ctrl -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/weight_idx
 add wave -noupdate -expand -group ctrl -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0/row_idx
@@ -60,7 +68,9 @@ add wave -noupdate -expand -group conv_input_buffer -radix unsigned -childformat
 add wave -noupdate -expand -group conv_input_buffer -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/col_index
 add wave -noupdate -expand -group conv_input_buffer -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/current_state
 add wave -noupdate -expand -group conv_input_buffer -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/row_index
-add wave -noupdate /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/buffer_array_ob
+add wave -noupdate -expand -group conv_input_buffer /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/buffer_array_ob_0
+add wave -noupdate -expand -group conv_input_buffer /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/buffer_array_ob_1
+add wave -noupdate -expand -group conv_input_buffer /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/U_conv_layer_input_buffer_0/buffer_array_ob_2
 add wave -noupdate -divider conv_kernel_array
 add wave -noupdate -group conv_kernel_array /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/clk
 add wave -noupdate -group conv_kernel_array /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/rst_n
@@ -68,6 +78,18 @@ add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer
 add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_weight
 add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/clear
 add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_bus
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_0
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_1
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_2
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_3
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_4
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/i_pixel_0_5
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_0
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_1
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_2
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_3
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_4
+add wave -noupdate -group conv_kernel_array -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_kernel_array_0/o_pixel_0_5
 add wave -noupdate -divider interface
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/clk
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/cmd
@@ -102,8 +124,8 @@ add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array
 add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/cmp_idx
 add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_in
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_in_reg_ob
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/clrPrevResult
-add wave -noupdate -expand /tb_top/U_pooling_layer_top_0/U_pooling_array_0/prev_result_ob
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/clear_prev_result
+add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/prev_result_ob
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/result_ob
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_out_ob
 add wave -noupdate -divider pooling_out_itf
@@ -112,14 +134,12 @@ add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rs
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid_delay_0
 add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_idx
 add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_row
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rowValid
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rowOutputFlag
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_in_ob
 add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_out_ob
 add wave -noupdate -divider {New Divider}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {7790 ns} 0}
+WaveRestoreCursors {{Cursor 1} {625 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 51
@@ -135,4 +155,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ns} {10624 ns}
+WaveRestoreZoom {0 ns} {2640 ns}

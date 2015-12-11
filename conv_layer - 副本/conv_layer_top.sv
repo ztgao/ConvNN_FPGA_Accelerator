@@ -136,24 +136,45 @@ U_conv_kernel_array_0 (
 // A type cast module for IEEE-754 to real. 
 // When synthesize the project in Vivado, please turn off it.
 //	--
+shortreal		o_pixel_bus_observe_0;
+shortreal		o_pixel_bus_observe_1;
+shortreal		o_pixel_bus_observe_2;
+shortreal		o_pixel_bus_observe_3;
+shortreal		o_pixel_bus_observe_4;
+shortreal		o_pixel_bus_observe_5;
 
-shortreal	o_pixel_bus_ob [ARRAY_SIZE];
-always @(*) begin
-	for (int i = 0; i < ARRAY_SIZE; i++)
-		o_pixel_bus_ob[i]	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-i)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
+always @(o_pixel_bus) begin
+	o_pixel_bus_observe_0	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-0)*`DATA_WIDTH-1:(ARRAY_SIZE-1)*`DATA_WIDTH]);
+	o_pixel_bus_observe_1	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-1)*`DATA_WIDTH-1:(ARRAY_SIZE-2)*`DATA_WIDTH]);
+	o_pixel_bus_observe_2	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-2)*`DATA_WIDTH-1:(ARRAY_SIZE-3)*`DATA_WIDTH]);
+	o_pixel_bus_observe_3	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-3)*`DATA_WIDTH-1:(ARRAY_SIZE-4)*`DATA_WIDTH]);
+	o_pixel_bus_observe_4	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-4)*`DATA_WIDTH-1:(ARRAY_SIZE-5)*`DATA_WIDTH]);
+	o_pixel_bus_observe_5	=	$bitstoshortreal(o_pixel_bus[(ARRAY_SIZE-5)*`DATA_WIDTH-1:(ARRAY_SIZE-6)*`DATA_WIDTH]);	
 end
 
+
 //	--
-shortreal	i_weight_observe;
+shortreal		i_weight_observe;
+
 always @(i_weight) begin
-	i_weight_observe =	$bitstoshortreal(i_weight);
+	i_weight_observe		=	$bitstoshortreal(i_weight);
 end
 
 //	--	
-shortreal	feature_ob [ARRAY_SIZE];
-always @(*) begin
-	for (int i = 0; i < ARRAY_SIZE; i++)
-		feature_ob[i]	=	$bitstoshortreal(feature_output[(ARRAY_SIZE-i)*`DATA_WIDTH-1 -: `DATA_WIDTH]);	
+shortreal		feature_observe_0;
+shortreal		feature_observe_1;
+shortreal		feature_observe_2;
+shortreal		feature_observe_3;
+shortreal		feature_observe_4;
+shortreal		feature_observe_5;
+
+always @(feature_output) begin
+	feature_observe_0		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-0)*`DATA_WIDTH-1:(ARRAY_SIZE-1)*`DATA_WIDTH]);
+	feature_observe_1		=	$bitstoshortreal(feature_output[(ARRAY_SIZE-1)*`DATA_WIDTH-1:(ARRAY_SIZE-2)*`DATA_WIDTH]);
+	feature_observe_2       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-2)*`DATA_WIDTH-1:(ARRAY_SIZE-3)*`DATA_WIDTH]);
+	feature_observe_3       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-3)*`DATA_WIDTH-1:(ARRAY_SIZE-4)*`DATA_WIDTH]);
+	feature_observe_4       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-4)*`DATA_WIDTH-1:(ARRAY_SIZE-5)*`DATA_WIDTH]);
+	feature_observe_5       =	$bitstoshortreal(feature_output[(ARRAY_SIZE-5)*`DATA_WIDTH-1:(ARRAY_SIZE-6)*`DATA_WIDTH]);	
 end
 
 /////////////////////////////////////////////////////////////////////////////
