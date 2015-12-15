@@ -4,15 +4,14 @@
 `include "../../global_define.v"
 
 module	pooling_input_interface #(
-	parameter	
-	KERNEL_SIZE	=	6,
-	ROW_WIDTH	=	3)
+	parameter
+	INPUT_SIZE	=	6,
+	KERNEL_SIZE	=	2)
 (
 //--input
 	clk,
 	rst_n,
 	input_valid,
-	block_idx,
 	data_in,
 //--output
 	data_out
@@ -20,11 +19,12 @@ module	pooling_input_interface #(
 
 `include "../../pooling_layer/pooling_param.v"
 
+localparam	ROW_WIDTH 	= 	logb2(INPUT_SIZE);
+
 input		clk;
 input		rst_n;
 input		input_valid;
 
-input		[ROW_WIDTH-1:0]	block_idx;
 
 input		[KERNEL_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
 output 		[`DATA_WIDTH-1:0]	data_out;	//	3

@@ -3,12 +3,9 @@
 
 `include "../../global_define.v"
 module conv_layer_controller
-#(parameter KERNEL_SIZE 	= 	2,
+#(parameter KERNEL_SIZE 	= 	3,
 			ARRAY_SIZE		= 	6,
-			ARRAY_WIDTH 	= 	3,
-			BUFFER_ROW_WIDTH = 	2,
-			TOTAL_WEIGHT 	= 	4,
-			WEIGHT_WIDTH	=	2)
+			TOTAL_WEIGHT 	= 	4)
 (	
 //--input
 	clk,
@@ -26,6 +23,10 @@ module conv_layer_controller
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
+
+localparam	WEIGHT_WIDTH	=	logb2(TOTAL_WEIGHT);
+localparam	ARRAY_WIDTH		=	logb2(ARRAY_SIZE);
+localparam	BUFFER_ROW_WIDTH=	logb2(KERNEL_SIZE);
 
 input					clk;
 input					rst_n;

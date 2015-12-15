@@ -8,6 +8,7 @@ module	pooling_max_cell(
 	clk,
 	rst_n,
 	a,
+	b,
 	clear,
 //--output	
 	result
@@ -17,6 +18,7 @@ module	pooling_max_cell(
 input		clk;
 input		rst_n;
 input		[`DATA_WIDTH-1:0]	a;
+input		[`DATA_WIDTH-1:0]	b;
 input		clear;
 
 output reg	[`DATA_WIDTH-1:0]	result;

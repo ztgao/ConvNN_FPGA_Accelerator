@@ -3,13 +3,11 @@
 
 `include "../../global_define.v"
 
-module	pooling_output_interface #(
+module pooling_output_interface #(
 	parameter
-	KERNEL_SIZE		=	2,
-	FEATURE_WIDTH	=	2,
-	TOTAL_FEATURE	=	4,
 	INPUT_SIZE		=	6,
-	ROW_WIDTH		=	3)
+	KERNEL_SIZE		=	2,
+	TOTAL_FEATURE	=	4)
 (
 //--input
 	clk,
@@ -19,10 +17,15 @@ module	pooling_output_interface #(
 	data_in,
 	input_valid,
 //--output
+	output_valid,
 	data_out
+	
 );
 
 `include "../../pooling_layer/pooling_param.v"
+
+localparam	ROW_WIDTH		=	logb2(INPUT_SIZE);
+localparam	FEATURE_WIDTH	=	logb2(TOTAL_FEATURE);
 
 input		clk;
 input		rst_n;
@@ -32,6 +35,7 @@ input 		input_valid;
 
 input		[`DATA_WIDTH-1:0]	data_in;	
 output reg 	[`DATA_WIDTH-1:0]	data_out;
+output reg	output_valid;
 
 reg		[`DATA_WIDTH-1:0]	buffer [0:TOTAL_FEATURE-1];
 
@@ -86,43 +90,6 @@ generate
 	end
 endgenerate
 
-
-
-/* always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) begin
-		buffer[0]	<=	`DATA_WIDTH 'b0;
-		buffer[1]	<=	`DATA_WIDTH 'b0;
-		buffer[2]	<=	`DATA_WIDTH 'b0;
-		buffer[3]	<=	`DATA_WIDTH 'b0;
-	end
-	else if (input_valid) begin
-		case(feature_row)
-			1, 3, 5: begin
-				case (feature_idx)
-					2'd0:	buffer[0]	<=	data_in;
-					2'd1:	buffer[1]	<=	data_in;
-					2'd2:	buffer[2]	<=	data_in;
-					2'd3:	buffer[3]	<=	data_in;
-				endcase
-			end
-				
-			default: begin
-				buffer[0]	<= buffer[0];
-				buffer[1]	<= buffer[1];
-				buffer[2]	<= buffer[2];
-				buffer[3]	<= buffer[3];
-			end			
-		endcase	
-	end
-	else begin
-		buffer[0]	<= buffer[0];
-		buffer[1]	<= buffer[1];
-		buffer[2]	<= buffer[2];
-		buffer[3]	<= buffer[3];	
-	end
-end */
-
-
 reg	input_valid_delay_0;
 
 always @(posedge clk, negedge rst_n) begin
@@ -130,6 +97,15 @@ always @(posedge clk, negedge rst_n) begin
 		input_valid_delay_0 <= 0;
 	else
 		input_valid_delay_0	<= input_valid;
+end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		output_valid	<=	0;
+	else if(rowOutputFlag)
+		output_valid	<=	input_valid_delay_0;
+	else
+		output_valid	<=	0;
 end
 
 

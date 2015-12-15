@@ -2,20 +2,24 @@
 //				-- 	setup
 
 `include "../../global_define.v"
-module	network_manager(
+
+module	network_manager #(
+	parameter
+	IMAGE_NUM	=	5)
+(
 //--input
 	clk,
 	rst_n,
 	start,
 	layer_0_calc_fin,
 //--output
-
-	layer_0_en,
-	
+	layer_0_en,	
 	data_out
 );
 
 `include "../../network/network_param.v"
+
+localparam	IMAGE_WIDTH	=	logb2(IMAGE_NUM);
 
 input		clk;
 input		rst_n;
@@ -27,7 +31,7 @@ output		data_out;
 output reg	layer_0_en;
 
 
-reg			[3:0]	input_image_idx;
+reg			[IMAGE_WIDTH-1:0]	input_image_idx;
 
 wire	lastImage	=	(input_image_idx	==	IMAGE_NUM - 1);
 	

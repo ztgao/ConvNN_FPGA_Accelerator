@@ -1,5 +1,6 @@
 onerror {resume}
-virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
+virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
 virtual type { \
 INIT\
 PRELOAD\
@@ -8,8 +9,7 @@ SHIFT\
 {0x6 LOAD}\
 {0x7 IDLE}\
 } FSM_TYPE
-virtual type { IDLE PRELOAD_FIN SHIFT_FIN LOAD_FIN} ACK_TYPE
-virtual type { IDLE PRELOAD SHIFT LOAD} CMD_TYPE
+virtual type { IDLE PRELOAD SHIFT LOAD} TOP_FSM_TYPE
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate
 quietly virtual function -install /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 -env /tb_top/U_conv_layer_top_0/U_conv_layer_controller_0 { (ACK_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack
@@ -77,7 +77,6 @@ add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/shift_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ext_rom_addr
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/ack
-add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/data_out
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/shift_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/buffer_col_idx
 add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/buffer_row_idx
@@ -85,41 +84,18 @@ add wave -noupdate -radix unsigned /tb_top/U_conv_layer_top_0/U_conv_layer_contr
 add wave -noupdate -divider {pooling top}
 add wave -noupdate /tb_top/U_pooling_layer_top_0/clk
 add wave -noupdate /tb_top/U_pooling_layer_top_0/rst_n
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/feature_idx
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/feature_row
-add wave -noupdate /tb_top/U_pooling_layer_top_0/data_in
-add wave -noupdate /tb_top/U_pooling_layer_top_0/data_from_cache_0
-add wave -noupdate /tb_top/U_pooling_layer_top_0/data_from_array_0
-add wave -noupdate /tb_top/U_pooling_layer_top_0/data_from_output_interface_0
+add wave -noupdate /tb_top/U_pooling_layer_top_0/input_valid
+add wave -noupdate /tb_top/U_pooling_layer_top_0/feature_idx
+add wave -noupdate /tb_top/U_pooling_layer_top_0/feature_row
+add wave -noupdate /tb_top/U_pooling_layer_top_0/data_in_ob
+add wave -noupdate /tb_top/U_pooling_layer_top_0/data_out_ob
 add wave -noupdate -divider {pooling buffer}
 add wave -noupdate -divider {New Divider}
 add wave -noupdate -divider {pooling array}
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/clk
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/rst_n
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/feature_idx
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/feature_row
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/current_state
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/cmp_idx
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_in
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_in_reg_ob
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/clrPrevResult
-add wave -noupdate -expand /tb_top/U_pooling_layer_top_0/U_pooling_array_0/prev_result_ob
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/result_ob
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_array_0/data_out_ob
 add wave -noupdate -divider pooling_out_itf
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/clk
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rst_n
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid_delay_0
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_idx
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/feature_row
-add wave -noupdate -radix unsigned /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rowValid
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/rowOutputFlag
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/input_valid
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_in_ob
-add wave -noupdate /tb_top/U_pooling_layer_top_0/U_pooling_output_interface_0/data_out_ob
 add wave -noupdate -divider {New Divider}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {7790 ns} 0}
+WaveRestoreCursors {{Cursor 1} {536 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 51
@@ -135,4 +111,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ns} {10624 ns}
+WaveRestoreZoom {0 ns} {5264 ns}

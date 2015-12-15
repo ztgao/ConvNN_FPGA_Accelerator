@@ -9,14 +9,9 @@ module conv_layer_top
 #(parameter 
 	KERNEL_SIZE 		= 	3,
 	IMAGE_SIZE			= 	8,
-	ARRAY_SIZE  		= 	6,
-	ARRAY_WIDTH 		= 	3,
-	BUFFER_ROW_WIDTH 	= 	2,
-	BUFFER_COL_WIDTH	= 	3,	
+	ARRAY_SIZE  		= 	6,	
 	TOTAL_WEIGHT		= 	4,
-	WEIGHT_WIDTH		= 	2,
-	WEIGHT_ROM_DEPTH	=	64,
-	WEIGHT_ADDR_WIDTH	=	6)			
+	WEIGHT_ROM_DEPTH	=	64)			
 (	
 //--input
 	clk,
@@ -34,26 +29,25 @@ module conv_layer_top
 
 `include "../../conv_layer/conv_kernel_param.v"
 
+localparam	WEIGHT_WIDTH		= 	logb2(TOTAL_WEIGHT);
+localparam	ARRAY_WIDTH			=	logb2(ARRAY_SIZE);
+
 input									clk;
 input									rst_n;
 input	[`DATA_WIDTH-1:0]				data_in;
 input									enable;
-
 
 output	[ARRAY_SIZE*`DATA_WIDTH-1:0]	feature_output;
 wire	[ARRAY_SIZE*`DATA_WIDTH-1:0]	o_pixel_bus;
 output	[`EXT_ADDR_WIDTH-1:0]			ext_rom_addr;
 
 output									image_calc_fin;
-output	[WEIGHT_WIDTH-1:0]							feature_idx;
-//	register connected to covolution kernel
+output	[WEIGHT_WIDTH-1:0]				feature_idx;
 
-output	[ARRAY_WIDTH-1:0]							feature_row;
+output	[ARRAY_WIDTH-1:0]				feature_row;
 
-reg		[ARRAY_SIZE*`DATA_WIDTH-1:0]	i_pixel_bus;
 wire	[`DATA_WIDTH-1:0]				i_weight;
 
-wire						kernel_array_clear;
 output						valid;
 
 wire	[1:0]				input_interface_cmd;
@@ -67,10 +61,7 @@ assign	feature_output	=	(valid)? feature: {ARRAY_SIZE{`DATA_WIDTH 'b0}};
 conv_layer_controller #(
 	.KERNEL_SIZE 		(KERNEL_SIZE),
 	.ARRAY_SIZE		    (ARRAY_SIZE),
-	.ARRAY_WIDTH 	    (ARRAY_WIDTH),
-	.BUFFER_ROW_WIDTH   (BUFFER_ROW_WIDTH),
-	.TOTAL_WEIGHT 	    (TOTAL_WEIGHT),
-	.WEIGHT_WIDTH	    (WEIGHT_WIDTH)	
+	.TOTAL_WEIGHT 	    (TOTAL_WEIGHT)
 )
 U_conv_layer_controller_0(
 //--input
@@ -87,18 +78,12 @@ U_conv_layer_controller_0(
 );
 
 
-
 conv_layer_input_interface #(
 	.KERNEL_SIZE 		(KERNEL_SIZE),
 	.IMAGE_SIZE	        (IMAGE_SIZE),
 	.ARRAY_SIZE	        (ARRAY_SIZE),
-	.ARRAY_WIDTH	    (ARRAY_WIDTH),
-	.BUFFER_ROW_WIDTH	(BUFFER_ROW_WIDTH),
-	.BUFFER_COL_WIDTH	(BUFFER_COL_WIDTH),
 	.WEIGHT_ROM_DEPTH	(WEIGHT_ROM_DEPTH),
-	.WEIGHT_ADDR_WIDTH	(WEIGHT_ADDR_WIDTH),
-	.TOTAL_WEIGHT		(TOTAL_WEIGHT),
-	.WEIGHT_WIDTH		(WEIGHT_WIDTH)
+	.TOTAL_WEIGHT		(TOTAL_WEIGHT)
 )
 U_conv_layer_input_interface_0 (
 // --input
@@ -156,6 +141,43 @@ always @(*) begin
 		feature_ob[i]	=	$bitstoshortreal(feature_output[(ARRAY_SIZE-i)*`DATA_WIDTH-1 -: `DATA_WIDTH]);	
 end
 
+//	-- print --
+
+shortreal	featMap[ARRAY_SIZE][ARRAY_SIZE][TOTAL_WEIGHT];
+always @(valid) begin
+	if(valid && ext_rom_addr < 'd785)
+		for (int i = 0; i < ARRAY_SIZE; i = i + 1)
+			featMap[feature_row][i][feature_idx] = feature_ob[i];
+end
+
+int fp_featMap;	
+int row;
+int col;
+int ch;
+
+initial begin
+	fp_featMap = $fopen("featMap.txt","w");
+end
+
+always @(ext_rom_addr)	begin
+	if(ext_rom_addr == 'd785) begin
+		for ( ch = 0; ch < TOTAL_WEIGHT; ch++) begin
+			for ( row = 0; row < ARRAY_SIZE; row++) begin
+				for( col = 0; col < ARRAY_SIZE; col++) begin
+					$fwrite(fp_featMap,"%f\t",featMap[row][col][ch]);
+				end
+//				$fwrite(fp_featMap, "\n");
+			end
+			$fwrite(fp_featMap, "\n");
+		end
+		$fclose(fp_featMap);
+	end			
+end
+
+//	----------	
+
+		
+	
 /////////////////////////////////////////////////////////////////////////////
 `endif
 

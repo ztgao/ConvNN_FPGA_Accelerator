@@ -4,9 +4,7 @@
 `include "../../global_define.v"
 module conv_layer_input_buffer
 #(parameter	BUFFER_ROW			= 3,
-			BUFFER_ROW_WIDTH	= 2,
-			BUFFER_COL			= 8,
-			BUFFER_COL_WIDTH	= 3)
+			BUFFER_COL			= 8)
 (// --input
 	clk,
 	rst_n,
@@ -20,6 +18,9 @@ module conv_layer_input_buffer
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
+
+localparam	BUFFER_ROW_WIDTH = logb2(BUFFER_ROW);
+localparam	BUFFER_COL_WIDTH = logb2(BUFFER_COL);
 
 
 input							clk;

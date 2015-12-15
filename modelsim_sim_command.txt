@@ -30,9 +30,9 @@ virtual	type {
 } CMD_TYPE;
 
 
-virtual function {(FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate;
-virtual function {(FSM_TYPE)/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate;
+virtual function {(FSM_TYPE)/tb_mnist_top/U_mnist_top/U_conv_layer_top_0/U_conv_layer_controller_0/current_state} ctrl_cstate;
+virtual function {(FSM_TYPE)/tb_mnist_top/U_mnist_top/U_conv_layer_top_0/U_conv_layer_input_interface_0/current_state} intf_cstate;
 
-virtual function {(ACK_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack;
-virtual function {(CMD_TYPE)/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_cmd} intf_cmd;
+virtual function {(ACK_TYPE)/tb_mnist_top/U_mnist_top/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_ack} intf_ack;
+virtual function {(CMD_TYPE)/tb_mnist_top/U_mnist_top/U_conv_layer_top_0/U_conv_layer_controller_0/input_interface_cmd} intf_cmd;
 

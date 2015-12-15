@@ -23,16 +23,11 @@
 
 `include "../../global_define.v"
 module conv_layer_input_interface 
-#(parameter	KERNEL_SIZE 		= 	2,
+#(parameter	KERNEL_SIZE 		= 	3,
 			IMAGE_SIZE			=	8,
 			ARRAY_SIZE			=	6,
-			ARRAY_WIDTH			=	3,
-			BUFFER_ROW_WIDTH	=	2,
-			BUFFER_COL_WIDTH	=	3,
 			WEIGHT_ROM_DEPTH	=	64,
-			WEIGHT_ADDR_WIDTH	=	6, 
-			TOTAL_WEIGHT		=	4,
-			WEIGHT_WIDTH		=	2)
+			TOTAL_WEIGHT		=	4)
 (
 // --input
 	clk,
@@ -48,6 +43,14 @@ module conv_layer_input_interface
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
+
+localparam	ARRAY_WIDTH			=	logb2(ARRAY_SIZE);
+localparam	BUFFER_ROW_WIDTH	=	logb2(KERNEL_SIZE);
+localparam	BUFFER_COL_WIDTH	=	logb2(IMAGE_SIZE);
+localparam	WEIGHT_WIDTH		=   logb2(TOTAL_WEIGHT);
+localparam	WEIGHT_ADDR_WIDTH	=	logb2(WEIGHT_ROM_DEPTH);
+
+
 
 input							clk;
 input							rst_n;
@@ -68,7 +71,6 @@ reg		[2:0]				next_state;
 reg		[BUFFER_ROW_WIDTH-1:0]	shift_idx;
 reg		[BUFFER_COL_WIDTH-1:0]	buffer_col_idx;
 reg		[BUFFER_ROW_WIDTH-1:0]	buffer_row_idx;
-reg		[BUFFER_ROW_WIDTH-1:0]	preload_cycle;
 
 wire	[IMAGE_SIZE*`DATA_WIDTH-1:0]	data_from_buffer;
 
@@ -92,7 +94,7 @@ always @(posedge clk, negedge rst_n) begin
 	end
 end
 
-always @(current_state, buffer_col_idx, shift_idx, preload_cycle,cmd) begin
+always @(current_state, buffer_col_idx, shift_idx, cmd) begin
 	case (current_state)	
 		
 //  Caution: whenever add a new state which could run into IDLE, 
@@ -307,9 +309,7 @@ end
 
 conv_layer_input_buffer #(
 	.BUFFER_ROW			(KERNEL_SIZE),	
-	.BUFFER_ROW_WIDTH	(BUFFER_ROW_WIDTH),
-	.BUFFER_COL			(IMAGE_SIZE),
-	.BUFFER_COL_WIDTH	(BUFFER_COL_WIDTH)
+	.BUFFER_COL			(IMAGE_SIZE)
 )
 U_conv_layer_input_buffer_0(
 // --input
@@ -318,17 +318,14 @@ U_conv_layer_input_buffer_0(
 	.data_in		(data_in),
 	.col_index		(buffer_col_idx),
 	.row_index		(buffer_row_idx),
-	.preload_cycle	(preload_cycle),
 	.current_state	(current_state),
 // --output
 	.data_out_bus	(data_from_buffer)
 );
 
 conv_weight_buffer #(
-	.WEIGHT_ADDR_WIDTH 	(WEIGHT_ADDR_WIDTH),
 	.WEIGHT_ROM_DEPTH	(WEIGHT_ROM_DEPTH),
-	.TOTAL_WEIGHT		(TOTAL_WEIGHT),
-	.WEIGHT_WIDTH		(WEIGHT_WIDTH)
+	.TOTAL_WEIGHT		(TOTAL_WEIGHT)
 )
 U_conv_weight_buffer_0(	
 //--input
@@ -342,7 +339,7 @@ U_conv_weight_buffer_0(
 
 `ifdef	DEBUG
 //	--	Observe the interface state
-always	@(current_state, preload_cycle) begin
+always	@(current_state) begin
 	case (current_state)
 			
 			// STATE_INIT: 

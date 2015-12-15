@@ -1,10 +1,11 @@
 // version 1.0 -- setup
 // Description:
 
+
 program type_cast;
 
 parameter	WIDTH	=	32;
-parameter	DEPTH	=	256;
+parameter	DEPTH	=	28*28*5;
 
 bit		[WIDTH-1:0]		float32_list[DEPTH];
 shortreal				real_list[DEPTH];
@@ -16,8 +17,11 @@ int 					w_idx;
 int 					a;
 
 initial begin
-	fp_r_real		=	$fopen("./real_list.txt","r");
-	fp_w_float32	=	$fopen("./float32_list.txt","w");
+//	fp_r_real		=	$fopen("./real_list.txt","r");
+//	fp_r_real		=	$fopen("./weight_conv1.txt","r");
+	fp_r_real		=	$fopen("./test_set_5.txt","r");
+	
+	fp_w_float32	=	$fopen("./test_set_5.float32.txt","w");
 	
 	r_idx			=	0;
 	w_idx			=	0;
@@ -30,6 +34,8 @@ initial begin
 	
 	for(w_idx=0; w_idx < r_idx; w_idx++) begin
 		$fdisplay(fp_w_float32,"%b",float32_list[w_idx]);
+		if( w_idx % 100 == 0)
+			$display("Now:",w_idx);
 	end
 	
 	$fclose(fp_r_real);

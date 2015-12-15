@@ -8,9 +8,7 @@ module	pooling_layer_top #(
 	INPUT_SIZE		=	6,
 	KERNEL_SIZE		=	2,
 	OUTPUT_SIZE		=	3,
-	TOTAL_FEATURE	=	4,
-	FEATURE_WIDTH	=	2,
-	ROW_WIDTH		=	3)
+	TOTAL_FEATURE	=	4)
 (
 //--input
 	clk,
@@ -20,10 +18,14 @@ module	pooling_layer_top #(
 	feature_row,
 	data_in,	
 //--output
+	output_valid,
 	data_out
 );
 
 `include "../../pooling_layer/pooling_param.v"
+
+localparam	ROW_WIDTH		=	logb2(INPUT_SIZE);
+localparam	FEATURE_WIDTH	=	logb2(TOTAL_FEATURE);
 
 input	clk;
 input	rst_n;
@@ -35,20 +37,53 @@ input	[ROW_WIDTH-1:0]	feature_row;
 input	[INPUT_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
 output	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_out;	//	3
 
-wire	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_from_cache;
-wire	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_from_array;
+output	output_valid;
 
-wire	[`DATA_WIDTH-1:0]	data_from_cache_0;
-wire	[`DATA_WIDTH-1:0]	data_from_array_0;
-wire	[`DATA_WIDTH-1:0]	data_from_output_interface_0;
+genvar	gv_poolChIdx;	
+generate
+	for (gv_poolChIdx = 0; gv_poolChIdx < OUTPUT_SIZE; gv_poolChIdx=gv_poolChIdx+1)
+	begin: genPoolCh
+	//////////////////////////////////
+		pooling_channel #(
+			.INPUT_SIZE		(INPUT_SIZE),
+			.KERNEL_SIZE	(KERNEL_SIZE),	
+			.TOTAL_FEATURE	(TOTAL_FEATURE))
+		U_pooling_channel (
+		//--input
+			.clk		(clk),
+			.rst_n		(rst_n),
+			.feature_idx(feature_idx),
+			.feature_row(feature_row),
+			.data_in	(data_in[(INPUT_SIZE-gv_poolChIdx*KERNEL_SIZE)*`DATA_WIDTH-1 -: KERNEL_SIZE*`DATA_WIDTH]),
+			.input_valid(input_valid),
+		//--output      
+			.output_valid(output_valid),
+			.data_out   (data_out[(OUTPUT_SIZE-gv_poolChIdx)*`DATA_WIDTH-1 -: `DATA_WIDTH])
+		);
+	//////////////////////////////////
+	end
+endgenerate
 
 
-wire	input_valid;
-wire	output_valid;
+`ifdef DEBUG
 
-reg		[ROW_WIDTH-1:0]	feature_idx_delay_0;
-reg		[ROW_WIDTH-1:0]	feature_row_delay_0;
+shortreal data_out_ob[OUTPUT_SIZE];
+always @(*) begin
+	for(int i = 0; i<OUTPUT_SIZE; i = i + 1)
+		data_out_ob[i]	=	$bitstoshortreal(data_out[(OUTPUT_SIZE - i)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
+end
 
+shortreal data_in_ob[INPUT_SIZE];
+always @(*) begin
+	for(int i = 0; i<INPUT_SIZE; i = i + 1)
+		data_in_ob[i]	=	$bitstoshortreal(data_in[(INPUT_SIZE - i)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
+
+end	
+
+//	-- print --
+
+reg			[ROW_WIDTH-1:0]	feature_idx_delay_0;
+reg			[ROW_WIDTH-1:0]	feature_row_delay_0;
 
 always @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -68,76 +103,39 @@ always @(posedge clk, negedge rst_n) begin
 		feature_row_delay_0	<=	feature_row_delay_0;
 end
 
+shortreal	poolMap[OUTPUT_SIZE][OUTPUT_SIZE][TOTAL_FEATURE];
+always @(output_valid) begin
+	if(output_valid && U_conv_layer_top_0.ext_rom_addr < 'd924)
+		for (int i = 0; i < OUTPUT_SIZE; i = i + 1)
+			poolMap[(feature_row_delay_0/2)][i][feature_idx_delay_0] = data_out_ob[i];
+end
 
-pooling_input_interface #(
-	.KERNEL_SIZE		(KERNEL_SIZE),
-	.ROW_WIDTH			(ROW_WIDTH)
-)
-U_pooling_input_interface_0(
-//--input
-	.clk				(clk),
-	.rst_n				(rst_n),
-	.input_valid		(input_valid),
-	.data_in			(data_in[INPUT_SIZE*`DATA_WIDTH-1 -: KERNEL_SIZE*`DATA_WIDTH]),		
-//--.output
-	.data_out			(data_from_cache_0)
-);
+int fp_poolMap;	
+int row;
+int col;
+int ch;
 
+initial begin
+	fp_poolMap = $fopen("poolMap.txt","w");
+end
 
-pooling_array #(
-	.KERNEL_SIZE		(KERNEL_SIZE),		
-	.TOTAL_FEATURE	    (TOTAL_FEATURE),
-	.FEATURE_WIDTH	    (FEATURE_WIDTH),
-	.ROW_WIDTH		    (ROW_WIDTH)
-)
-U_pooling_array_0(
-//--input
-	.clk		(clk),
-	.rst_n		(rst_n),
-	.data_in	(data_from_cache_0),
-	
-	.input_valid(input_valid),
-	.feature_idx(feature_idx_delay_0),
-	.feature_row(feature_row_delay_0),
-//--output
-	.output_valid(output_valid),
-	.data_out	 (data_from_array_0)	
-);
+always @(U_conv_layer_top_0.ext_rom_addr)	begin
+	if(U_conv_layer_top_0.ext_rom_addr == 'd924) begin
+		for ( ch = 0; ch < TOTAL_FEATURE; ch++) begin
+			for ( row = 0; row < OUTPUT_SIZE; row++) begin
+				for( col = 0; col < OUTPUT_SIZE; col++) begin
+					$fwrite(fp_poolMap,"%f\t",poolMap[row][col][ch]);
+				end
+//				$fwrite(fp_poolMap, "\n");
+			end
+			$fwrite(fp_poolMap, "\n");
+		end
+		$fclose(fp_poolMap);
+	end			
+end
 
-
-pooling_output_interface #(
-	.KERNEL_SIZE		(KERNEL_SIZE),
-	.FEATURE_WIDTH		(FEATURE_WIDTH),	
-	.TOTAL_FEATURE	    (TOTAL_FEATURE),
-	.ROW_WIDTH		    (ROW_WIDTH)
-)
-U_pooling_output_interface_0(
-//--input
-	.clk		(clk),
-	.rst_n		(rst_n),
-	.feature_idx(feature_idx_delay_0),
-	.feature_row(feature_row_delay_0),
-	.data_in	(data_from_array_0),
-	.input_valid(output_valid),
-//--output
-	.data_out	(data_from_output_interface_0)
-);
-
-`ifdef DEBUG
-
-// shortreal data_from_cache_ob[OUTPUT_SIZE];
-// always @(*) begin
-	 // data_from_cache_ob[0]	=	$bitstoshortreal(data_from_cache[(OUTPUT_SIZE - 0)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-	 // data_from_cache_ob[1]	=	$bitstoshortreal(data_from_cache[(OUTPUT_SIZE - 1)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-	 // data_from_cache_ob[2]	=	$bitstoshortreal(data_from_cache[(OUTPUT_SIZE - 2)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-// end
-
-// shortreal data_from_array_ob[OUTPUT_SIZE];
-// always @(*) begin
-	 // data_from_array_ob[0]	=	$bitstoshortreal(data_from_array[(OUTPUT_SIZE - 0)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-	 // data_from_array_ob[1]	=	$bitstoshortreal(data_from_array[(OUTPUT_SIZE - 1)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-	 // data_from_array_ob[2]	=	$bitstoshortreal(data_from_array[(OUTPUT_SIZE - 2)*`DATA_WIDTH-1 -: `DATA_WIDTH]);
-// end		 
+//	----------	
+ 
 	 
 `endif
 

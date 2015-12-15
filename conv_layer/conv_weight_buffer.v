@@ -5,11 +5,8 @@
 // weight.
 `include "../../global_define.v"
 module conv_weight_buffer
-#(parameter	WEIGHT_ADDR_WIDTH 	= 	6,
-			WEIGHT_ROM_DEPTH	= 	64,
-			TOTAL_WEIGHT		=	4,
-			WEIGHT_WIDTH		=	2
-)
+#(parameter	WEIGHT_ROM_DEPTH	= 	64,
+			TOTAL_WEIGHT		=	4)
 (//--input
 	clk,
 	rst_n,
@@ -21,6 +18,9 @@ module conv_weight_buffer
 );
 
 `include "../../conv_layer/conv_kernel_param.v"
+
+localparam	WEIGHT_ADDR_WIDTH	=	logb2(WEIGHT_ROM_DEPTH);
+localparam	WEIGHT_WIDTH		=	logb2(TOTAL_WEIGHT);
 
 input					clk;
 input					rst_n;
@@ -56,10 +56,15 @@ always @(posedge clk, negedge rst_n) begin
 end
 
 `ifdef	RTL_SIMULATION		
-	rom_64x32_sim	U_rom_64x32_sim_0(
+	// rom_64x32_sim	U_rom_64x32_sim_0(
+		// .addr	(rom_addr),
+		// .data_o	(r_data)
+	// );
+	rom_1kx32_sim	U_rom_1kx32_sim_0(
 		.addr	(rom_addr),
 		.data_o	(r_data)
-	);
+	);	
+	
 	
 `else
 	rom_weight_64x32 U_rom_weight_64x32  (
