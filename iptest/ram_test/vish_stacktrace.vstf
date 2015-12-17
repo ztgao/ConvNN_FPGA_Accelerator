@@ -1,0 +1,46 @@
+# Current time Wed Dec 16 10:53:42 2015
+# ModelSim Stack Trace
+# Program = vish
+# Id = "10.2c"
+# Version = "2013.07"
+# Date = "Jul 19 2013"
+# Platform = win64
+
+Exception c0000005 has occurred at address 40219134. Traceback:
+# 0    0x40219134: 'Mtirpc_Init + 0x130f84'
+# 1    0x402207fb: 'Mtirpc_Init + 0x13864b'
+# 2    0x40221a78: 'Mtirpc_Init + 0x1398c8'
+# 3    0x40221c12: 'Mtirpc_Init + 0x139a62'
+# 4    0x10011461: 'Tcl_ListMathFuncs + 0x591'
+# 5    0x1005931a: 'Tcl_ExprObj + 0x1baa'
+# 6    0x10057f0a: 'Tcl_ExprObj + 0x79a'
+# 7    0x100130b0: 'TclEvalObjEx + 0x3e0'
+# 8    0x10012cbd: 'Tcl_EvalObjEx + 0x1d'
+# 9    0x8000c0ef: 'Itcl_EvalMemberCode + 0x22f'
+# 10   0x8000c3a4: 'Itcl_ExecMethod + 0x184'
+# 11   0x800108d6: 'Itcl_EvalArgs + 0x106'
+# 12   0x8000db97: 'Itcl_HandleInstance + 0x167'
+# 13   0x10011461: 'Tcl_ListMathFuncs + 0x591'
+# 14   0x1005931a: 'Tcl_ExprObj + 0x1baa'
+# 15   0x100a62b4: 'TclObjInterpProcCore + 0x74'
+# 16   0x10011461: 'Tcl_ListMathFuncs + 0x591'
+# 17   0x100118d1: 'Tcl_EvalObjv + 0x51'
+# 18   0x10012e2b: 'TclEvalObjEx + 0x15b'
+# 19   0x10012cbd: 'Tcl_EvalObjEx + 0x1d'
+# 20   0x400baa86: '<unknown (@0x400baa86)>'
+# 21   0x400be51d: '<unknown (@0x400be51d)>'
+# 22   0x400be5cc: '<unknown (@0x400be5cc)>'
+# 23   0x400be84b: '<unknown (@0x400be84b)>'
+# 24   0x400bebc8: '<unknown (@0x400bebc8)>'
+# 25   0x100b9a1c: 'TclServiceIdle + 0x6c'
+# 26   0x100954c1: 'Tcl_DoOneEvent + 0x181'
+# 27   0x102e21a5: 'Tk_MainLoop + 0x25'
+# 28   0x102ae12b: 'Tk_MainEx + 0x91b'
+# 29   0x401084bd: 'Mtirpc_Init + 0x2030d'
+# 30   0x4010a017: 'Mtirpc_Init + 0x21e67'
+# 31   0x405727fe: 'Sqlite_Unload + 0x3d2ae'
+# 32   0x36078102: 'BaseThreadInitThunk + 0x22'
+# 33   0x3627c2e4: 'RtlUserThreadStart + 0x34'
+StackWalk failed 0
+# End of Stack Trace
+

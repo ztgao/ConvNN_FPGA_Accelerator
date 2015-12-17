@@ -58,7 +58,7 @@ initial begin
 	// idle		=	1;
 	// #100
 	// idle		=	0;
-	#300000
+	#150000
 	
 	$stop;
 end

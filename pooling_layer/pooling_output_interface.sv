@@ -18,8 +18,7 @@ module pooling_output_interface #(
 	input_valid,
 //--output
 	output_valid,
-	data_out
-	
+	data_out	
 );
 
 `include "../../pooling_layer/pooling_param.v"
@@ -30,7 +29,7 @@ localparam	FEATURE_WIDTH	=	logb2(TOTAL_FEATURE);
 input		clk;
 input		rst_n;
 input		[FEATURE_WIDTH-1:0]	feature_idx;
-input		[ROW_WIDTH-1:0]	feature_row;
+input		[ROW_WIDTH-1:0]		feature_row;
 input 		input_valid;
 
 input		[`DATA_WIDTH-1:0]	data_in;	
@@ -38,6 +37,10 @@ output reg 	[`DATA_WIDTH-1:0]	data_out;
 output reg	output_valid;
 
 reg		[`DATA_WIDTH-1:0]	buffer [0:TOTAL_FEATURE-1];
+
+wire	lastFeature;
+assign	lastFeature	=	(feature_idx == TOTAL_FEATURE - 1);
+
 
 reg	[ROW_WIDTH-1:0]	rowValid;
 always @(posedge clk, negedge rst_n) begin
@@ -62,6 +65,14 @@ always @(feature_row) begin
 	else
 		rowOutputFlag	=	0;
 end
+
+output reg	[ROW_WIDTH-1:0]	feature_row_o;
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n)
+		feature_row_o	<=	'd0;
+	else if(lastFeature && rowOutputFlag)
+		feature_row_o
 
 
 genvar	gvBufIdx;

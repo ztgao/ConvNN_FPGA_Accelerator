@@ -1,0 +1,27 @@
+D:/Gzt/project/conv_kernel/rtl/network/ram_3kx32_sim_netlist.v {1 {vlog -work work -vopt D:/Gzt/project/conv_kernel/rtl/network/ram_3kx32_sim_netlist.v
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module ram_3kx32
+-- Compiling module ram_3kx32_dist_mem_gen_v8_0_9
+-- Compiling module ram_3kx32_dist_mem_gen_v8_0_9_synth
+-- Compiling module ram_3kx32_spram
+-- Compiling module glbl
+
+Top level modules:
+	ram_3kx32
+	glbl
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/iptest/ram_test/tb_ram.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/iptest/ram_test/tb_ram.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module tb_ram
+
+Top level modules:
+	tb_ram
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/network/ram_3kx32_sim.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/network/ram_3kx32_sim.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module ram_3kx32_sim
+
+Top level modules:
+	ram_3kx32_sim
+
+} {} {}}

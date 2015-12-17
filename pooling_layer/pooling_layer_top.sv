@@ -19,6 +19,8 @@ module	pooling_layer_top #(
 	data_in,	
 //--output
 	output_valid,
+	feature_idx_o,
+	feature_row_o,	
 	data_out
 );
 
@@ -32,12 +34,41 @@ input	rst_n;
 input	input_valid;
 
 input	[FEATURE_WIDTH-1:0]	feature_idx;
-input	[ROW_WIDTH-1:0]	feature_row;
+input	[ROW_WIDTH-1:0]		feature_row;
 
 input	[INPUT_SIZE*`DATA_WIDTH-1:0]	data_in;	//	6
 output	[OUTPUT_SIZE*`DATA_WIDTH-1:0]	data_out;	//	3
 
 output	output_valid;
+
+output	[FEATURE_WIDTH-1:0]	feature_idx_o;
+output	[ROW_WIDTH-1:0]		feature_row_o;
+
+reg		[ROW_WIDTH-1:0]	feature_idx_delay_0;
+reg		[ROW_WIDTH-1:0]	feature_row_delay_0;
+
+
+assign	feature_idx_o	=	feature_idx_delay_0;
+assign	feature_row_o	=	feature_row_delay_0;
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		feature_idx_delay_0	<=	0;
+	else if(input_valid)
+		feature_idx_delay_0	<=	feature_idx;
+	else
+		feature_idx_delay_0	<=	feature_idx_delay_0;
+end
+
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) 
+		feature_row_delay_0	<=	0;
+	else if(input_valid)
+		feature_row_delay_0	<=	feature_row;
+	else
+		feature_row_delay_0	<=	feature_row_delay_0;
+end
+
 
 genvar	gv_poolChIdx;	
 generate
@@ -65,6 +96,9 @@ generate
 endgenerate
 
 
+//	--	for simulation observation
+//
+//
 `ifdef DEBUG
 
 shortreal data_out_ob[OUTPUT_SIZE];
@@ -81,28 +115,9 @@ always @(*) begin
 end	
 
 //	-- print --
+ 
 
-reg			[ROW_WIDTH-1:0]	feature_idx_delay_0;
-reg			[ROW_WIDTH-1:0]	feature_row_delay_0;
-
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) 
-		feature_idx_delay_0	<=	0;
-	else if(input_valid)
-		feature_idx_delay_0	<=	feature_idx;
-	else
-		feature_idx_delay_0	<=	feature_idx_delay_0;
-end
-
-always @(posedge clk, negedge rst_n) begin
-	if(!rst_n) 
-		feature_row_delay_0	<=	0;
-	else if(input_valid)
-		feature_row_delay_0	<=	feature_row;
-	else
-		feature_row_delay_0	<=	feature_row_delay_0;
-end
-
+/*
 shortreal	poolMap[OUTPUT_SIZE][OUTPUT_SIZE][TOTAL_FEATURE];
 always @(output_valid) begin
 	if(output_valid && U_conv_layer_top_0.ext_rom_addr < 'd924)
@@ -136,7 +151,7 @@ end
 
 //	----------	
  
-	 
+	  */
 `endif
 
 

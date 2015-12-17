@@ -47,13 +47,6 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 Top level modules:
 	conv_kernel_array
 
-} {} {}} D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_output_interface.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_output_interface.sv
-Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
--- Compiling module pooling_output_interface
-
-Top level modules:
-	pooling_output_interface
-
 } {} {}} D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_channel.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/pooling_layer/pooling_channel.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 -- Compiling module pooling_channel
@@ -81,6 +74,13 @@ Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
 
 Top level modules:
 	conv_kernel
+
+} {} {}} D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/conv_layer/conv_layer_top.sv
+Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+-- Compiling module conv_layer_top
+
+Top level modules:
+	conv_layer_top
 
 } {} {}} D:/Gzt/project/conv_kernel/rtl/network/network_manager.sv {1 {vlog -work work -vopt -sv D:/Gzt/project/conv_kernel/rtl/network/network_manager.sv
 Model Technology ModelSim SE-64 vlog 10.2c Compiler 2013.07 Jul 19 2013

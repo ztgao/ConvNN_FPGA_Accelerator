@@ -23,6 +23,9 @@ wire	[24*`DATA_WIDTH-1:0]	feature_output;
 
 wire	output_valid;
 
+wire	[4:0]		feature_idx_o;
+wire    [4:0]		feature_row_o;
+
 network_manager #(
 	.IMAGE_NUM		(5)
 )
@@ -80,8 +83,32 @@ U_pooling_layer_top_0(
 	.feature_row		(feature_row),
 //--.output
 	.output_valid		(output_valid),
+	.feature_idx_o		(feature_idx_o),
+	.feature_row_o	    (feature_row_o),
 	.data_out			(pooling_output)
 );
+
+interlayer_buffer #(	
+	.BUFFER_DEPTH	(4096),
+	.INPUT_SIZE		(12),
+	.TOTAL_FEATURE	(20)
+)
+U_interlayer_buffer_0(
+//--input
+	.clk		(clk),
+	.rst_n		(rst_n),
+	.data_i		(pooling_output),
+	.valid_i	(output_valid),	
+	.feature_row(feature_row_o),
+	.feature_idx(feature_idx_o),
+//	.rd,
+//	.addr_rd,
+//	.wr,
+	
+//--output
+	.data_o		()
+);
+
 
 
 /* `ifdef	RTL_SIMULATION	
